@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weekly Launch Digest — June 05, 2026</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: #f0f2f5;
+      color: #1a1a2e;
+    }
+
+    /* Layout */
+    #app {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Digest panel */
+    #digest-panel {
+      flex: 1 1 60%;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    #digest-header {
+      background: #1a1a2e;
+      color: white;
+      padding: 18px 32px;
+      flex-shrink: 0;
+    }
+
+    #digest-header h1 {
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    #digest-header .date {
+      font-size: 12px;
+      color: #8888aa;
+      margin-top: 3px;
+    }
+
+    #digest-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 32px;
+      background: #f0f2f5;
+    }
+
+    .digest-section {
+      background: white;
+      border-radius: 8px;
+      padding: 24px 28px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-label::before {
+      content: "";
+      display: inline-block;
+      width: 3px;
+      height: 14px;
+      border-radius: 2px;
+    }
+
+    .section-label.funding { color: #0055cc; }
+    .section-label.funding::before { background: #0055cc; }
+    .section-label.launches { color: #007744; }
+    .section-label.launches::before { background: #007744; }
+
+    /* Chat panel */
+    #chat-panel {
+      flex: 0 0 380px;
+      display: flex;
+      flex-direction: column;
+      background: #1a1a2e;
+      color: #e0e0f0;
+      border-left: 1px solid rgba(255,255,255,0.06);
+    }
+
+    #chat-header {
+      padding: 16px 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    #chat-header h2 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    #chat-header .subtitle {
+      font-size: 11px;
+      color: #6666aa;
+      margin-top: 2px;
+    }
+
+    #change-key-btn {
+      background: none;
+      border: 1px solid rgba(255,255,255,0.12);
+      color: #8888bb;
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #change-key-btn:hover { border-color: rgba(255,255,255,0.28); color: #aaaacc; }
+
+    #messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    #messages:empty::before {
+      content: "Dig deeper on any company, launch, or theme — ask why a rating landed where it did, how a launch compares to past examples, or what you should watch next.";
+      color: #44446a;
+      font-size: 13px;
+      line-height: 1.65;
+      display: block;
+      padding: 4px 0;
+    }
+
+    .message {
+      max-width: 92%;
+      padding: 10px 13px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.65;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+    }
+
+    .message.user {
+      background: #0055cc;
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 3px;
+    }
+
+    .message.assistant {
+      background: #272740;
+      color: #d0d0e8;
+      align-self: flex-start;
+      border-bottom-left-radius: 3px;
+    }
+
+    .message.error {
+      background: #3a1a1a;
+      color: #ff8888;
+      align-self: flex-start;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.25; }
+      50% { opacity: 1; }
+    }
+
+    .message.loading .message-content::after {
+      content: "●●●";
+      letter-spacing: 3px;
+      font-size: 9px;
+      animation: pulse 1.3s infinite;
+    }
+
+    #chat-input-area {
+      padding: 12px;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+      flex-shrink: 0;
+    }
+
+    #chat-input {
+      flex: 1;
+      background: #272740;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      color: #e0e0f0;
+      font-family: inherit;
+      font-size: 13px;
+      padding: 9px 12px;
+      resize: none;
+      min-height: 40px;
+      max-height: 120px;
+      line-height: 1.5;
+      outline: none;
+      overflow-y: auto;
+    }
+
+    #chat-input:focus { border-color: rgba(0, 85, 204, 0.6); }
+    #chat-input::placeholder { color: #44446a; }
+
+    #send-btn {
+      background: #0055cc;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+
+    #send-btn:hover { background: #0044aa; }
+    #send-btn:disabled { background: #2a2a44; cursor: not-allowed; }
+
+    /* API key modal */
+    #modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.72);
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      backdrop-filter: blur(4px);
+    }
+
+    #modal-overlay.visible { display: flex; }
+
+    #modal {
+      background: #1e1e30;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 28px 32px;
+      width: 400px;
+      max-width: 90vw;
+    }
+
+    #modal h2 { font-size: 17px; color: #fff; margin-bottom: 8px; }
+
+    #modal .modal-desc {
+      font-size: 13px;
+      color: #8888aa;
+      line-height: 1.65;
+      margin-bottom: 18px;
+    }
+
+    #modal-key-input {
+      width: 100%;
+      background: #272740;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 7px;
+      color: #e0e0f0;
+      font-family: monospace;
+      font-size: 13px;
+      padding: 10px 12px;
+      outline: none;
+      margin-bottom: 12px;
+    }
+
+    #modal-key-input:focus { border-color: rgba(0, 85, 204, 0.7); }
+
+    #modal-save-btn {
+      width: 100%;
+      background: #0055cc;
+      color: white;
+      border: none;
+      border-radius: 7px;
+      padding: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    #modal-save-btn:hover { background: #0044aa; }
+
+    #modal .modal-note {
+      margin-top: 12px;
+      font-size: 11px;
+      color: #55556a;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- API key modal -->
+  <div id="modal-overlay">
+    <div id="modal">
+      <h2>Connect Claude</h2>
+      <p class="modal-desc">Enter your Anthropic API key to ask follow-up questions about this digest. Your key is stored only in your browser and sent directly to Anthropic's API &mdash; never to any other server.</p>
+      <input type="password" id="modal-key-input" placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false">
+      <button id="modal-save-btn" onclick="saveApiKey()">Start chatting &rarr;</button>
+      <p class="modal-note">Get your key at console.anthropic.com &rarr; API Keys</p>
+    </div>
+  </div>
+
+  <!-- App -->
+  <div id="app">
+
+    <!-- Digest panel -->
+    <div id="digest-panel">
+      <div id="digest-header">
+        <h1>Weekly Launch Digest</h1>
+        <div class="date">Week ending June 05, 2026</div>
+      </div>
+      <div id="digest-scroll">
+
+        <div class="digest-section">
+          <div class="section-label funding">VC Funding Announcements</div>
+          <div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">IMPULSE SPACE</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Impulse Space raised a $500 million Series D led by 137 Ventures and BANNER VC, with Founders Fund among the participating investors. The company builds highly maneuverable spacecraft and is focused on in-space mobility, including its Mira platform. Proceeds will be used to hire up to 200 new employees. No new valuation was disclosed.</p>
+  <a href="https://techcrunch.com/2026/06/02/rocket-engine-startup-impulse-raises-500-million-to-hire-people-not-ai/" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">DRIVENETS</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">DriveNets, an Israeli networking startup, raised a $410 million round at an $8.5 billion valuation. Bessemer Venture Partners co-led the round alongside Atreides Management, with additional participation from Pitango, D1 Capital Partners, AMD, and Red Dot Capital Partners. No specific use of funds was disclosed in the announcement.</p>
+  <a href="https://amp.axios.com/pro-rata-premium-first-look-3a75d2c9-b85f-4bbb-8ad0-bc5e4920c494.html" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">SUPABASE</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Supabase, a San Francisco-based Postgres database management platform, raised $500 million in a Series F round at a $10.5 billion post-money valuation. GIC led the round, with Accel participating as an existing insider alongside YC, Craft Ventures, Felicis, Peak XV Partners, and Coatue. No specific use of funds was disclosed in the announcement.</p>
+  <a href="https://www.axios.com/pro/all-deals/2026/06/04/pro-rata-premium-first-look" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">NSAVE</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">nsave, a Swiss-based offshore banking platform, raised $18 million in a Series A round with participation from Sequoia Capital and Y Combinator. The company provides international accounts, global transfers, and savings products to underbanked populations who lack access to stable foreign currency banking. Funds will be used to expand its financial services platform. No new valuation was disclosed.</p>
+  <a href="https://www.thesaasnews.com/news/nsave-raises-18m-series-a/" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+        </div>
+
+        <div class="digest-section">
+          <div class="section-label launches">Top B2B Product Launches</div>
+          <p style="font-style: italic; color: #555; margin-bottom: 24px; font-size: 14px;"><strong>Analyst Note:</strong> This was a notably thin week for standalone B2B software product launches — the news cycle was dominated by IPO speculation (Anthropic, SpaceX), macro market commentary, and conference preview coverage for WWDC and Microsoft Build rather than discrete, campaign-backed product launches. The most substantive B2B signal came from adjacent categories (fintech infrastructure, retail media, hospitality SaaS), but even the strongest entries this week lack the media depth or launch execution rigor that would normally merit top scores. Only two launches clear the qualifying bar with reasonable confidence; a third is included at a lower tier as the best available option in a slow cycle.</p>
+
+---
+
+<div class="launch-item" style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #eee;">
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
+    <h3 style="margin: 0; font-size: 17px; font-weight: 600; color: #1a1a2e; flex: 1;">Microsoft — Unmetered Agentic AI Models & Majorana 2 (Build 2026)</h3>
+    <span style="display: inline-block; background: #0055cc; color: white; padding: 3px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-left: 12px; white-space: nowrap;">7/10</span>
+  </div>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.65;">
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600; width: 130px;">Company</td>
+      <td style="padding: 6px 0; color: #333;">Microsoft is a global enterprise software and cloud incumbent operating at enormous scale across Azure, Microsoft 365, GitHub, and Copilot product lines. Build is their annual developer-focused conference and one of the most-watched keynotes in the enterprise calendar.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">The Launch</td>
+      <td style="padding: 6px 0; color: #333;">At Microsoft Build 2026, CEO Satya Nadella unveiled Unmetered Agentic AI Models — a pricing and infrastructure shift allowing developers to deploy AI agents without per-token billing constraints — alongside a preview of the Majorana 2 quantum computing chip and the OpenClaw native Windows app. The core B2B value proposition is removing cost unpredictability from AI agent deployment, a key friction point for enterprise adoption at scale.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Product Fit</td>
+      <td style="padding: 6px 0; color: #333;">Unmetered Agentic AI fits squarely into Microsoft's Azure AI / Copilot platform push and directly addresses the cost anxiety that has slowed enterprise AI agent rollouts. Majorana 2 is a longer-horizon play that reinforces Azure's infrastructure credibility. Together they signal Microsoft is competing on both near-term developer economics and long-term compute differentiation — a coherent dual narrative for Build's audience.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Launch Playbook</td>
+      <td style="padding: 6px 0; color: #333;">Conference keynote slot (Build 2026, San Francisco) as the primary launch vehicle, with CNET highlight coverage amplifying the announcements. The keynote format gives Microsoft guaranteed Tier-1 media pickup and live developer audience engagement. No details in the source material about press embargoes, partner co-announcements, or community seeding tactics, which limits the score.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Messaging</td>
+      <td style="padding: 6px 0; color: #333;">The "Unmetered" framing is a deliberate pricing narrative — positioning the cost model as a feature, not just a technical spec. It directly counters developer/enterprise anxiety about unpredictable AI spend, borrowing a page from SaaS flat-rate messaging playbooks. Majorana 2 adds a forward-looking "we're building the future of compute" halo that makes the keynote feel bigger than any single product. What was left unsaid: specific pricing tiers, availability timelines, and benchmark comparisons against competing platforms.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Why This Rating</td>
+      <td style="padding: 6px 0; color: #333;">Microsoft earns inclusion because Build is a genuine Tier-1 conference keynote slot and the "Unmetered" positioning is a smart, differentiated messaging move that addresses a real enterprise pain point in plain language. The score is capped at 7 because the source material only surfaces CNET highlight coverage — deeper TechCrunch/Bloomberg/WSJ analysis that would confirm broader Tier-1 pickup isn't present in the provided articles, and Microsoft's sheer scale means even a strong launch doesn't move the needle on "strategic disruption" the way a startup's would.</td>
+    </tr>
+  </table>
+
+  <div style="margin-top: 10px;">
+    <a href="https://www.cnet.com/videos/microsoft-build-2026-keynote-highlights/" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+  </div>
+</div>
+
+---
+
+<div class="launch-item" style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #eee;">
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
+    <h3 style="margin: 0; font-size: 17px; font-weight: 600; color: #1a1a2e; flex: 1;">Ramp — AI Agent Corporate Card & Token Spend Management</h3>
+    <span style="display: inline-block; background: #0055cc; color: white; padding: 3px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-left: 12px; white-space: nowrap;">6/10</span>
+  </div>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.65;">
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600; width: 130px;">Company</td>
+      <td style="padding: 6px 0; color: #333;">Ramp is a high-growth B2B fintech offering corporate cards, expense management, procurement, and accounting automation. The company just raised $750M at a $44B valuation, cementing its status as one of the most valuable private fintech companies in the U.S.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">The Launch</td>
+      <td style="padding: 6px 0; color: #333;">Ramp launched a corporate credit card specifically designed for AI agents to use autonomously, alongside an AI token spend management product that lets businesses monitor and govern their AI API spend across providers. The value proposition: as companies deploy AI agents that make real purchases, Ramp becomes the financial control layer for the agentic enterprise.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Product Fit</td>
+      <td style="padding: 6px 0; color: #333;">This is a natural and clever extension of Ramp's core spend management platform into an emerging category — agentic AI payments — where no established incumbent exists yet. It plays directly to Ramp's strengths in card infrastructure and spend controls, while the token spend management product creates a new data moat around AI procurement that competitors can't easily replicate without Ramp's existing financial integrations.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Launch Playbook</td>
+      <td style="padding: 6px 0; color: #333;">The product launch was bundled with the $750M funding announcement, maximizing media surface area — TechCrunch covered both together, giving the product launches a Tier-1 press halo they might not have earned standalone. CEO Eric Glyman published a long-form blog post as a thought leadership play. No conference slot, partner co-announcement, or dedicated product campaign is evident from the source material.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Messaging</td>
+      <td style="padding: 6px 0; color: #333;">Ramp is positioning itself as "the financial infrastructure for the agentic enterprise" — a category-creation move that frames AI agent payments as an inevitable new spend category that CFOs need to govern. The token spend management framing is particularly sharp: it gives IT and finance buyers a concrete, immediate pain point (out-of-control AI API costs) to hang the broader narrative on. Notably, the TechCrunch reporter flagged the CEO's blog post as feeling "AI-generated," which is an ironic messaging own-goal for a company pitching AI credibility.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Why This Rating</td>
+      <td style="padding: 6px 0; color: #333;">The product concept is genuinely novel — a corporate card for AI agents is a category-creating idea with real strategic legs — and Tier-1 TechCrunch coverage gives it legitimate launch signal. The score is held to a 6 because the launch execution was piggyback rather than standalone: the products themselves were buried inside a funding announcement rather than launched with their own dedicated campaign, demo, or activation strategy. The AI-generated blog post undercuts the narrative polish you'd expect from a company at this valuation.</td>
+    </tr>
+  </table>
+
+  <div style="margin-top: 10px;">
+    <a href="https://techcrunch.com/2026/06/04/ramp-raises-750m-at-44b-valuation-as-investors-hunger-for-fintechs-with-an-ai-story/" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+  </div>
+</div>
+
+---
+
+<div class="launch-item" style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #eee;">
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
+    <h3 style="margin: 0; font-size: 17px; font-weight: 600; color: #1a1a2e; flex: 1;">DoorDash Ads — Global Commerce Media Platform</h3>
+    <span style="display: inline-block; background: #0055cc; color: white; padding: 3px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-left: 12px; white-space: nowrap;">5/10</span>
+  </div>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.65;">
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600; width: 130px;">Company</td>
+      <td style="padding: 6px 0; color: #333;">DoorDash is a large-scale consumer delivery platform operating across food, grocery, and retail verticals. DoorDash Ads is its B2B advertising business, targeting merchants and CPG brands looking to reach high-intent buyers on the platform.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">The Launch</td>
+      <td style="padding: 6px 0; color: #333;">DoorDash Ads relaunched as a "Global Commerce Media Platform," introducing a new suite spanning expanded ad formats, offsite reach capabilities, campaign automation tools, and enhanced measurement. The pitch to B2B advertisers: DoorDash's audience is uniquely high-intent ("consumers come ready to buy"), and the new platform gives brands the tools to reach them across channels with a clearer ROI view.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Product Fit</td>
+      <td style="padding: 6px 0; color: #333;">The platform expansion is a logical evolution — DoorDash has the first-party purchase data that makes retail media valuable, and the move to offsite reach mirrors exactly what Amazon Ads, Instacart Ads, and Walmart Connect have done before it. The risk is that DoorDash is a fast-follower in retail media infrastructure rather than a category creator, which limits the "disruption" narrative.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Launch Playbook</td>
+      <td style="padding: 6px 0; color: #333;">Announced via Business Wire with Financial Times market data pickup — standard press release distribution rather than an earned media or event-driven launch. No conference slot, customer co-announcement, product demo video, or community activation is evident. The launch appears to have been a PR wire push without a broader campaign architecture behind it.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Messaging</td>
+      <td style="padding: 6px 0; color: #333;">The "ready to buy" intent positioning is the strongest element
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Chat panel -->
+    <div id="chat-panel">
+      <div id="chat-header">
+        <div>
+          <h2>Ask Claude</h2>
+          <div class="subtitle">Follow-up on this digest</div>
+        </div>
+        <button id="change-key-btn" onclick="showModal()">API key</button>
+      </div>
+      <div id="messages"></div>
+      <div id="chat-input-area">
+        <textarea id="chat-input" placeholder="Ask a follow-up…" rows="1"></textarea>
+        <button id="send-btn" onclick="handleSend()" title="Send (Enter)">&#9658;</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const SYSTEM_CONTEXT = `You are a helpful assistant with deep expertise in B2B product marketing, venture capital, and the startup ecosystem. The user has just read the Weekly Launch Digest for the week ending June 05, 2026 and wants to dig deeper on what they read. Answer follow-up questions thoughtfully. Draw on your broader knowledge when relevant, not just the digest content.
+
+DIGEST CONTENT:
+
+--- VC FUNDING ANNOUNCEMENTS ---
+IMPULSE SPACE Impulse Space raised a $500 million Series D led by 137 Ventures and BANNER VC, with Founders Fund among the participating investors. The company builds highly maneuverable spacecraft and is focused on in-space mobility, including its Mira platform. Proceeds will be used to hire up to 200 new employees. No new valuation was disclosed. Read more → DRIVENETS DriveNets, an Israeli networking startup, raised a $410 million round at an $8.5 billion valuation. Bessemer Venture Partners co-led the round alongside Atreides Management, with additional participation from Pitango, D1 Capital Partners, AMD, and Red Dot Capital Partners. No specific use of funds was disclosed in the announcement. Read more → SUPABASE Supabase, a San Francisco-based Postgres database management platform, raised $500 million in a Series F round at a $10.5 billion post-money valuation. GIC led the round, with Accel participating as an existing insider alongside YC, Craft Ventures, Felicis, Peak XV Partners, and Coatue. No specific use of funds was disclosed in the announcement. Read more → NSAVE nsave, a Swiss-based offshore banking platform, raised $18 million in a Series A round with participation from Sequoia Capital and Y Combinator. The company provides international accounts, global transfers, and savings products to underbanked populations who lack access to stable foreign currency banking. Funds will be used to expand its financial services platform. No new valuation was disclosed. Read more →
+
+--- TOP B2B PRODUCT LAUNCHES ---
+Analyst Note: This was a notably thin week for standalone B2B software product launches — the news cycle was dominated by IPO speculation (Anthropic, SpaceX), macro market commentary, and conference preview coverage for WWDC and Microsoft Build rather than discrete, campaign-backed product launches. The most substantive B2B signal came from adjacent categories (fintech infrastructure, retail media, hospitality SaaS), but even the strongest entries this week lack the media depth or launch execution rigor that would normally merit top scores. Only two launches clear the qualifying bar with reasonable confidence; a third is included at a lower tier as the best available option in a slow cycle. --- Microsoft — Unmetered Agentic AI Models & Majorana 2 (Build 2026) 7/10 Company Microsoft is a global enterprise software and cloud incumbent operating at enormous scale across Azure, Microsoft 365, GitHub, and Copilot product lines. Build is their annual developer-focused conference and one of the most-watched keynotes in the enterprise calendar. The Launch At Microsoft Build 2026, CEO Satya Nadella unveiled Unmetered Agentic AI Models — a pricing and infrastructure shift allowing developers to deploy AI agents without per-token billing constraints — alongside a preview of the Majorana 2 quantum computing chip and the OpenClaw native Windows app. The core B2B value proposition is removing cost unpredictability from AI agent deployment, a key friction point for enterprise adoption at scale. Product Fit Unmetered Agentic AI fits squarely into Microsoft's Azure AI / Copilot platform push and directly addresses the cost anxiety that has slowed enterprise AI agent rollouts. Majorana 2 is a longer-horizon play that reinforces Azure's infrastructure credibility. Together they signal Microsoft is competing on both near-term developer economics and long-term compute differentiation — a coherent dual narrative for Build's audience. Launch Playbook Conference keynote slot (Build 2026, San Francisco) as the primary launch vehicle, with CNET highlight coverage amplifying the announcements. The keynote format gives Microsoft guaranteed Tier-1 media pickup and live developer audience engagement. No details in the source material about press embargoes, partner co-announcements, or community seeding tactics, which limits the score. Messaging The "Unmetered" framing is a deliberate pricing narrative — positioning the cost model as a feature, not just a technical spec. It directly counters developer/enterprise anxiety about unpredictable AI spend, borrowing a page from SaaS flat-rate messaging playbooks. Majorana 2 adds a forward-looking "we're building the future of compute" halo that makes the keynote feel bigger than any single product. What was left unsaid: specific pricing tiers, availability timelines, and benchmark comparisons against competing platforms. Why This Rating Microsoft earns inclusion because Build is a genuine Tier-1 conference keynote slot and the "Unmetered" positioning is a smart, differentiated messaging move that addresses a real enterprise pain point in plain language. The score is capped at 7 because the source material only surfaces CNET highlight coverage — deeper TechCrunch/Bloomberg/WSJ analysis that would confirm broader Tier-1 pickup isn't present in the provided articles, and Microsoft's sheer scale means even a strong launch doesn't move the needle on "strategic disruption" the way a startup's would. Read more → --- Ramp — AI Agent Corporate Card & Token Spend Management 6/10 Company Ramp is a high-growth B2B fintech offering corporate cards, expense management, procurement, and accounting automation. The company just raised $750M at a $44B valuation, cementing its status as one of the most valuable private fintech companies in the U.S. The Launch Ramp launched a corporate credit card specifically designed for AI agents to use autonomously, alongside an AI token spend management product that lets businesses monitor and govern their AI API spend across providers. The value proposition: as companies deploy AI agents that make real purchases, Ramp becomes the financial control layer for the agentic enterprise. Product Fit This is a natural and clever extension of Ramp's core spend management platform into an emerging category — agentic AI payments — where no established incumbent exists yet. It plays directly to Ramp's strengths in card infrastructure and spend controls, while the token spend management product creates a new data moat around AI procurement that competitors can't easily replicate without Ramp's existing financial integrations. Launch Playbook The product launch was bundled with the $750M funding announcement, maximizing media surface area — TechCrunch covered both together, giving the product launches a Tier-1 press halo they might not have earned standalone. CEO Eric Glyman published a long-form blog post as a thought leadership play. No conference slot, partner co-announcement, or dedicated product campaign is evident from the source material. Messaging Ramp is positioning itself as "the financial infrastructure for the agentic enterprise" — a category-creation move that frames AI agent payments as an inevitable new spend category that CFOs need to govern. The token spend management framing is particularly sharp: it gives IT and finance buyers a concrete, immediate pain point (out-of-control AI API costs) to hang the broader narrative on. Notably, the TechCrunch reporter flagged the CEO's blog post as feeling "AI-generated," which is an ironic messaging own-goal for a company pitching AI credibility. Why This Rating The product concept is genuinely novel — a corporate card for AI agents is a category-creating idea with real strategic legs — and Tier-1 TechCrunch coverage gives it legitimate launch signal. The score is held to a 6 because the launch execution was piggyback rather than standalone: the products themselves were buried inside a funding announcement rather than launched with their own dedicated campaign, demo, or activation strategy. The AI-generated blog post undercuts the narrative polish you'd expect from a company at this valuation. Read more → --- DoorDash Ads — Global Commerce Media Platform 5/10 Company DoorDash is a large-scale consumer delivery platform operating across food, grocery, and retail verticals. DoorDash Ads is its B2B advertising business, targeting merchants and CPG brands looking to reach high-intent buyers on the platform. The Launch DoorDash Ads relaunched as a "Global Commerce Media Platform," introducing a new suite spanning expanded ad formats, offsite reach capabilities, campaign automation tools, and enhanced measurement. The pitch to B2B advertisers: DoorDash's audience is uniquely high-intent ("consumers come ready to buy"), and the new platform gives brands the tools to reach them across channels with a clearer ROI view. Product Fit The platform expansion is a logical evolution — DoorDash has the first-party purchase data that makes retail media valuable, and the move to offsite reach mirrors exactly what Amazon Ads, Instacart Ads, and Walmart Connect have done before it. The risk is that DoorDash is a fast-follower in retail media infrastructure rather than a category creator, which limits the "disruption" narrative. Launch Playbook Announced via Business Wire with Financial Times market data pickup — standard press release distribution rather than an earned media or event-driven launch. No conference slot, customer co-announcement, product demo video, or community activation is evident. The launch appears to have been a PR wire push without a broader campaign architecture behind it. Messaging The "ready to buy" intent positioning is the strongest element`;
+    const history = [];
+    let busy = false;
+
+    // ── API key ──────────────────────────────────────────────────
+
+    const KEY_STORE = 'wld_anthropic_key';
+
+    function getKey() { return localStorage.getItem(KEY_STORE) || ''; }
+
+    function saveApiKey() {
+      const val = document.getElementById('modal-key-input').value.trim();
+      if (!val.startsWith('sk-ant-')) {
+        document.getElementById('modal-key-input').style.borderColor = '#cc3333';
+        return;
+      }
+      localStorage.setItem(KEY_STORE, val);
+      hideModal();
+      document.getElementById('chat-input').focus();
+    }
+
+    function showModal() {
+      document.getElementById('modal-key-input').value = getKey();
+      document.getElementById('modal-key-input').style.borderColor = '';
+      document.getElementById('modal-overlay').classList.add('visible');
+      setTimeout(() => document.getElementById('modal-key-input').focus(), 60);
+    }
+
+    function hideModal() {
+      document.getElementById('modal-overlay').classList.remove('visible');
+    }
+
+    document.getElementById('modal-overlay').addEventListener('click', function(e) {
+      if (e.target === this) hideModal();
+    });
+
+    document.getElementById('modal-key-input').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') saveApiKey();
+    });
+
+    if (!getKey()) showModal();
+
+    // ── Chat UI ──────────────────────────────────────────────────
+
+    function addMessage(role, text) {
+      const wrap = document.createElement('div');
+      wrap.className = 'message ' + role;
+      const content = document.createElement('span');
+      content.className = 'message-content';
+      content.textContent = text;
+      wrap.appendChild(content);
+      document.getElementById('messages').appendChild(wrap);
+      scrollBottom();
+      return wrap;
+    }
+
+    function scrollBottom() {
+      const el = document.getElementById('messages');
+      el.scrollTop = el.scrollHeight;
+    }
+
+    const textarea = document.getElementById('chat-input');
+
+    textarea.addEventListener('input', () => {
+      textarea.style.height = 'auto';
+      textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+    });
+
+    textarea.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
+    });
+
+    function handleSend() {
+      const text = textarea.value.trim();
+      if (!text || busy) return;
+      textarea.value = '';
+      textarea.style.height = 'auto';
+      chat(text);
+    }
+
+    // ── Streaming API call ───────────────────────────────────────
+
+    async function chat(userText) {
+      if (!getKey()) { showModal(); return; }
+
+      busy = true;
+      document.getElementById('send-btn').disabled = true;
+
+      history.push({ role: 'user', content: userText });
+      addMessage('user', userText);
+
+      const assistantEl = addMessage('assistant', '');
+      assistantEl.classList.add('loading');
+
+      try {
+        const res = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'x-api-key': getKey(),
+            'anthropic-version': '2023-06-01',
+            'content-type': 'application/json',
+            'anthropic-dangerous-direct-browser-access': 'true',
+          },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-6',
+            max_tokens: 1024,
+            stream: true,
+            system: SYSTEM_CONTEXT,
+            messages: history,
+          }),
+        });
+
+        assistantEl.classList.remove('loading');
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error?.message || 'HTTP ' + res.status);
+        }
+
+        let reply = '';
+        const reader = res.body.getReader();
+        const dec = new TextDecoder();
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          for (const line of dec.decode(value, { stream: true }).split('\n')) {
+            if (!line.startsWith('data: ')) continue;
+            const raw = line.slice(6).trim();
+            if (!raw) continue;
+            try {
+              const ev = JSON.parse(raw);
+              if (ev.type === 'content_block_delta' && ev.delta?.type === 'text_delta') {
+                reply += ev.delta.text;
+                assistantEl.querySelector('.message-content').textContent = reply;
+                scrollBottom();
+              }
+            } catch {}
+          }
+        }
+
+        history.push({ role: 'assistant', content: reply });
+
+      } catch (err) {
+        assistantEl.classList.remove('loading');
+        assistantEl.classList.add('error');
+        assistantEl.querySelector('.message-content').textContent = 'Error: ' + err.message;
+        history.pop();
+      }
+
+      busy = false;
+      document.getElementById('send-btn').disabled = false;
+      document.getElementById('chat-input').focus();
+    }
+  </script>
+
+</body>
+</html>

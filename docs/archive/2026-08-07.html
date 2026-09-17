@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weekly Launch Digest — August 07, 2026</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      min-height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: #f0f2f5;
+      color: #1a1a2e;
+    }
+
+    #page { max-width: 740px; margin: 0 auto; padding: 0 16px 48px; }
+
+    /* Header */
+    #digest-header {
+      background: #1a1a2e;
+      margin: 0 -16px;
+      padding: 24px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    #digest-header h1 {
+      font-size: 19px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.3px;
+    }
+
+    #digest-header .date { font-size: 12px; color: #8888aa; margin-top: 3px; }
+
+    #digest-header .archive-link {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #8899cc;
+      text-decoration: none;
+    }
+
+    #digest-header .archive-link:hover { color: #aabbee; }
+
+    /* Open in Claude button */
+    #claude-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #0055cc;
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      padding: 9px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+      flex-shrink: 0;
+    }
+
+    #claude-btn:hover { background: #0044aa; }
+    #claude-btn.copied { background: #007744; cursor: default; }
+    #claude-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    #copy-hint {
+      font-size: 11px;
+      color: #8888aa;
+      margin-top: 6px;
+      text-align: right;
+      display: none;
+    }
+
+    #copy-hint.visible { display: block; }
+
+    /* Sections */
+    .digest-section {
+      background: white;
+      border-radius: 8px;
+      padding: 24px 28px;
+      margin-top: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-label::before {
+      content: "";
+      display: inline-block;
+      width: 3px;
+      height: 14px;
+      border-radius: 2px;
+    }
+
+    .section-label.funding { color: #0055cc; }
+    .section-label.funding::before { background: #0055cc; }
+    .section-label.launches { color: #007744; }
+    .section-label.launches::before { background: #007744; }
+
+    /* ── Digest content (targets from digest/render.py) ───────────── */
+
+    .d-item {
+      margin-bottom: 32px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .d-item:last-child, .d-fund-item:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .d-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .d-title {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 600;
+      color: #1a1a2e;
+      flex: 1;
+      line-height: 1.4;
+    }
+
+    .d-score, .d-score-na {
+      display: inline-block;
+      color: white;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 700;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .d-score { background: #0055cc; font-size: 13px; }
+    .d-score-na { background: #777; font-size: 12px; }
+
+    .d-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .d-th {
+      padding: 6px 12px 6px 0;
+      vertical-align: top;
+      white-space: nowrap;
+      color: #555;
+      font-weight: 600;
+      width: 130px;
+      text-align: left;
+    }
+
+    .d-td { padding: 6px 0; color: #333; }
+    .d-table tr:nth-child(even) { background: #fafafa; }
+
+    .d-steal {
+      margin-top: 14px;
+      padding: 12px 14px;
+      background: #f2f7f4;
+      border-left: 3px solid #007744;
+      border-radius: 4px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #234;
+    }
+
+    .d-steal-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.1px;
+      text-transform: uppercase;
+      color: #007744;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .d-evidence {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #888;
+      line-height: 1.55;
+    }
+
+    .d-note {
+      font-style: italic;
+      color: #555;
+      margin-bottom: 20px;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .d-pattern {
+      margin-bottom: 24px;
+      padding: 14px 16px;
+      background: #f7f7fb;
+      border-left: 3px solid #0055cc;
+      border-radius: 4px;
+      font-size: 14px;
+      line-height: 1.7;
+      color: #333;
+    }
+
+    .d-pattern-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.1px;
+      text-transform: uppercase;
+      color: #0055cc;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .d-links { margin-top: 10px; font-size: 13px; }
+    .d-link { color: #0055cc; text-decoration: none; }
+    .d-link:hover { text-decoration: underline; }
+    .d-empty { color: #666; font-size: 14px; }
+
+    .d-fund-item {
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .d-fund-title {
+      margin: 0 0 8px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #1a1a2e;
+    }
+
+    .d-fund-body {
+      margin: 0 0 10px;
+      line-height: 1.65;
+      color: #333;
+      font-size: 14px;
+    }
+
+    /* Archive index */
+    .archive-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .archive-row:last-child { border-bottom: none; }
+    .archive-row a { color: #0055cc; text-decoration: none; font-weight: 600; font-size: 15px; }
+    .archive-row a:hover { text-decoration: underline; }
+    .archive-row .meta { font-size: 12px; color: #888; }
+
+    @media (max-width: 560px) {
+      .d-table, .d-table tbody, .d-table tr, .d-th, .d-td { display: block; width: auto; }
+      .d-th { padding-bottom: 0; }
+      .d-td { padding-top: 2px; padding-bottom: 10px; }
+      .d-table tr:nth-child(even) { background: transparent; }
+    }
+  </style>
+</head>
+<body>
+  <div id="page">
+
+    <div id="digest-header">
+      <div>
+        <h1>Weekly Launch Digest</h1>
+        <div class="date">Week ending August 07, 2026</div>
+        <a class="archive-link" href="../archive.html">Browse past weeks &rarr;</a>
+      </div>
+      <div>
+        <button id="claude-btn" onclick="openInClaude()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <span id="btn-label">Discuss in Claude.ai</span>
+        </button>
+        <div id="copy-hint">Digest copied &mdash; just paste into Claude.ai</div>
+      </div>
+    </div>
+
+    <div class="digest-section">
+      <div class="section-label launches">Top B2B Product Launches</div>
+      <p style="font-style: italic; color: #555; margin-bottom: 24px; font-size: 14px;"><strong>Analyst Note:</strong> This was a notably thin week for high-conviction B2B software launches — the article set skews heavily toward earnings updates, consumer tech, and press releases that are more corporate housekeeping than true product launches. The one genuine standout is June AI, which executed a textbook stealth-to-launch playbook with exceptional investor social proof. HG Insights' RGI platform and Zoom's Revenue Accelerator restructuring round out the list as competent, if unspectacular, GTM moves. Marketers looking for inspiration this week are better served studying what June AI did right than anything else in this batch.</p>
+
+<div class="launch-item" style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #eee;">
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
+    <h3 style="margin: 0; font-size: 17px; font-weight: 600; color: #1a1a2e; flex: 1;">June AI — Agentic Enterprise Software Implementation Platform</h3>
+    <span style="display: inline-block; background: #0055cc; color: white; padding: 3px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-left: 12px; white-space: nowrap;">8.5/10</span>
+  </div>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.65;">
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600; width: 130px;">Company</td>
+      <td style="padding: 6px 0; color: #333;">June AI is a New York-based startup emerging from stealth, purpose-built to automate enterprise software implementation using AI agents. Pre-revenue at launch, the company is backed by $20M in pre-seed funding — an unusually large pre-seed round signaling high investor conviction before a single public customer.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">The Launch</td>
+      <td style="padding: 6px 0; color: #333;">June AI launched publicly with a platform that deploys AI agents to handle the traditionally slow, expensive, and consultant-heavy process of enterprise software implementation (ERP, CRM, and similar systems). The core pitch: compress implementation timelines from months to weeks and dramatically reduce the services spend that has long been the hidden tax on enterprise software adoption.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Product Fit</td>
+      <td style="padding: 6px 0; color: #333;">As a net-new company, there's no existing product suite to extend — but the thesis is exceptionally well-framed for the current moment. Enterprise software implementation is a documented $50B+ professional services market that has resisted automation for decades. The agentic AI wave provides the first credible technical wedge, and the team is positioning directly against the SI (systems integrator) ecosystem rather than the software vendors themselves, which is a smart flanking move that avoids immediate incumbent retaliation.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Launch Playbook</td>
+      <td style="padding: 6px 0; color: #333;">June AI executed a near-perfect stealth-to-launch playbook. The centerpiece was an extraordinary investor roster used as earned media: Marc Benioff (TIME Ventures lead), Michael Dell, Diane Greene (VMware co-founder), Aaron Levie (Box CEO), and George Kurtz (CrowdStrike CEO). Each name signals a specific enterprise software credential — this wasn't random celebrity capital, it was curated proof-by-association. Coverage landed in SiliconANGLE and citybiz on the same day, suggesting a coordinated press embargo. The $20M pre-seed figure itself served as a signal amplifier, as it's well above the typical pre-seed range and generates its own newsworthiness.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Messaging</td>
+      <td style="padding: 6px 0; color: #333;">The narrative is tight and urgency-aware: "as enterprises race to deploy artificial intelligence, implementation bottlenecks are the new barrier." This frames June AI not as a nice-to-have productivity tool but as critical infrastructure for AI adoption itself — a clever second-order positioning that makes their TAM look like "every enterprise trying to deploy AI," not merely "every enterprise doing an ERP migration." Notably absent: any specific customer names or live case studies, which is the one gap that a sharp buyer would probe immediately.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Why This Rating</td>
+      <td style="padding: 6px 0; color: #333;">June AI scores this high because the investor co-announcement strategy is genuinely sophisticated — each backer is a domain-specific credibility signal, not just a check. The messaging architecture is clean and the problem framing is resonant with a real, undersolved enterprise pain point. It loses points for the absence of a marquee customer alongside the launch and limited tier-1 media penetration (SiliconANGLE is solid trade coverage, but no TechCrunch, Bloomberg, or WSJ pickup visible in the article set), leaving meaningful amplification on the table for a $20M stealth exit.</td>
+    </tr>
+  </table>
+
+  <div style="margin-top: 10px;">
+    <a href="https://siliconangle.com/2026/08/03/june-launches-20m-speed-enterprise-software-projects" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+  </div>
+</div>
+
+<div class="launch-item" style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #eee;">
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
+    <h3 style="margin: 0; font-size: 17px; font-weight: 600; color: #1a1a2e; flex: 1;">HG Insights — Revenue Growth Intelligence (RGI) Platform</h3>
+    <span style="display: inline-block; background: #0055cc; color: white; padding: 3px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-left: 12px; white-space: nowrap;">6/10</span>
+  </div>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.65;">
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600; width: 130px;">Company</td>
+      <td style="padding: 6px 0; color: #333;">HG Insights is a growth-stage B2B intelligence company that provides technology install data, buying signals, and market intelligence to enterprise GTM teams. Its acquisition of TrustRadius added a buyer-review dimension to its data asset, making it one of the more complete revenue intelligence data platforms in the market.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">The Launch</td>
+      <td style="padding: 6px 0; color: #333;">HG Insights launched the Revenue Growth Intelligence (RGI) platform — a unified layer that consolidates its technology intelligence, TrustRadius buyer-review data, and agentic AI infrastructure into a single GTM precision tool. Simultaneously, TrustRadius announced its 2026 Top Rated Awards while reframing verified reviews as "fuel for AI discovery" (GEO — Generative Engine Optimization), positioning the review corpus as LLM training and retrieval fodder for B2B vendors.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Product Fit</td>
+      <td style="padding: 6px 0; color: #333;">This is a logical and well-telegraphed evolution. HG Insights has long sold technology install data to sales and marketing teams; adding agentic orchestration on top of that data asset is a natural upsell motion. The GEO angle for TrustRadius is genuinely smart product thinking — as AI-powered search erodes traditional SEO value for review sites, reframing the review corpus as an AI discoverability asset defends their core business model while opening a new value narrative for vendor customers.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Launch Playbook</td>
+      <td style="padding: 6px 0; color: #333;">The launch doubles down on owned channels — press release distribution and the annual Top Rated Awards cycle, which serves as a content and earned media engine by activating winning vendors to amplify. The GEO framing is new and likely to generate trade press pickup in the B2B marketing and SEO/AEO communities. However, there's no evidence of a conference anchor, major media embargo, or influencer seeding visible in the coverage. The dual announcement (RGI platform + Top Rated Awards) risks diluting attention between two separate narratives.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Messaging</td>
+      <td style="padding: 6px 0; color: #333;">The "industry's first GEO-powered software review platform" claim is a bold category-creation move and the most memorable line in the launch. The RGI platform messaging leans on "GTM precision" and "agentic infrastructure" — competent but crowded language in 2026 where every revenue intelligence vendor is making nearly identical claims. The GEO angle is the differentiated hook; more of the launch energy should have been concentrated there rather than split with the broader RGI announcement.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Why This Rating</td>
+      <td style="padding: 6px 0; color: #333;">The GEO-for-B2B-reviews concept is genuinely novel and deserves more launch real estate than it received. The RGI platform launch is strategically sound but executes in a space already saturated with "unified revenue intelligence" messaging, making differentiation hard. The decision to bundle two distinct announcements into one release dilutes both narratives and is the most correctable execution mistake here.</td>
+    </tr>
+  </table>
+
+  <div style="margin-top: 10px;">
+    <a href="https://www.google.com/goto?url=CAES1QEB7keqTVGISAHMYyxOUpdjYD3sdK2YeEtMZ2ZHeG8Op_mAGvSvpCd7upYceDbTGzvyxEmR7ZhiMAvRskl4x79URKotX8DRH2rKqEDZXZdGPTFRhOS5QC-sLNK5Pv0L1V5g_1JuMh7FuTdS9KixLio6OO0_l2DQxk3vAELO24xUgo5m5rONJ08KVt7ScK4aCBrbJhFJfvr6AvykrmU18lD8AYmRAAV6kLB5TaMoMxxK8mps0p0CzkGFzFsON9T1itUZ4Xuf_jbU_-RC3ZmgpxvnPKhJFqM%3D" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+  </div>
+</div>
+
+<div class="launch-item" style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #eee;">
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
+    <h3 style="margin: 0; font-size: 17px; font-weight: 600; color: #1a1a2e; flex: 1;">Zoom — Revenue Accelerator AI Sales Coaching Expansion & Consumption Pricing Restructure</h3>
+    <span style="display: inline-block; background: #0055cc; color: white; padding: 3px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-left: 12px; white-space: nowrap;">5.5/10</span>
+  </div>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.65;">
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600; width: 130px;">Company</td>
+      <td style="padding: 6px 0; color: #333;">Zoom is a large-cap public company best known for video communications but actively repositioning itself as a broader AI-powered work platform. Zoom Revenue Accelerator (ZRA) is its conversation intelligence and sales coaching product, competing with Gong, Clari, and Salesloft in the revenue intelligence category.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">The Launch</td>
+      <td style="padding: 6px 0; color: #333;">Zoom expanded ZRA to deliver AI-guided sales coaching across the full sales cycle — before, during, and after calls — and simultaneously restructured its pricing model to consumption-based tiers (Essentials launching August 2026). The "Ask ZRA" feature allows sellers and managers to query their full conversation history in plain language, functioning as a natural language interface over a proprietary revenue data warehouse.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color:
+    </div>
+
+    <div class="digest-section">
+      <div class="section-label funding">VC Funding Announcements</div>
+      <div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Valar Atomics</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Valar Atomics raised a $1 billion Series B, with Sequoia Capital leading the round and Sequoia partner Shaun Maguire joining the board. Bloomberg reported a valuation of $6 billion. The Torrance, California-based microreactor startup also secured a $200 million credit facility from Erebor and other banks. Funds will be used to advance manufacturing and deployment of its 5-megawatt Ward 250 reactor for AI infrastructure, industrial, and national security applications.</p>
+  <a href="https://techcrunch.com/2026/08/03/sequoias-shaun-maguire-leads-1b-round-for-nuclear-startup-valar-atomics" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Mariana Minerals</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Mariana Minerals raised a $310 million Series B led by Khosla Ventures, with Andreessen Horowitz participating as a returning backer, alongside Breakthrough Energy Ventures, Greenoaks, and Halo Fund. The San Francisco-based startup is working to modernize mining operations, with a focus on copper extraction to support AI and energy infrastructure. No valuation was disclosed. The company was cofounded in 2024 by Turner Caldwell, Baker Tilney, and Juan Lozano.</p>
+  <a href="https://fortune.com/2026/08/03/power-ai-khosla-a16z-bet-startup-reinvent-mining-mariana-minerals" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">K2 Space</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">K2 Space raised $500 million in Series D funding, bringing its valuation to $6.8 billion. The round was led by Kleiner Perkins and Iconiq Capital, with Lightspeed Venture Partners among the additional participants alongside CapitalG, Altimeter Capital Management, ARK Invest, Spark Capital, and Sands Capital. The Torrance, California-based satellite company has not specified a detailed use of proceeds beyond scaling its satellite operations.</p>
+  <a href="https://labusinessjournal.com/featured/k2-space-lands-500-million-funding-round" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Chai Discovery</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Chai Discovery closed a Series C round led by Index Ventures, with Kleiner Perkins, Sequoia Capital, and Dimension also participating, along with a broad group of investors including General Catalyst, Bain Capital Ventures, Battery Ventures, and OpenAI. The company is now valued at $3.8 billion. Chai Discovery operates in the health tech sector, though the articles reviewed did not specify a precise use of funds from this round.</p>
+  <a href="https://medcitynews.com/2026/08/4-notable-health-tech-funding-announcements-in-july" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Arrakis</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Arrakis emerged from stealth with $37.5 million in total funding, comprising a $30 million Series A led by Blossom Capital and a $7.5 million Seed round led by Accel. The London and Paris-based startup helps industrial companies, including construction firms, embed AI agents into their technology stacks. The company combines forward-deployed AI engineers with a model-agnostic enterprise AI platform. No valuation was disclosed.</p>
+  <a href="https://www.constructiondive.com/news/contech-firms-artificial-intelligence-robotics/827044" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Spur</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Spur, a bot-detection startup, raised $200 million from Insight Partners. The round was announced on July 29. No valuation or detailed use of proceeds was disclosed in the articles reviewed.</p>
+  <a href="https://cybersecurityventures.com/extreme-heat-warning-summer-2026-cybersecurity-venture-capital-investments" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+    </div>
+
+  </div>
+
+  <script>
+    const CONTEXT_PROMPT = `This is the archived Weekly Launch Digest for the week ending August 07, 2026.`;
+
+    async function openInClaude() {
+      const btn = document.getElementById('claude-btn');
+      const label = document.getElementById('btn-label');
+      const hint = document.getElementById('copy-hint');
+
+      try {
+        await navigator.clipboard.writeText(CONTEXT_PROMPT);
+        btn.classList.add('copied');
+        label.textContent = 'Copied!';
+        hint.classList.add('visible');
+      } catch (e) {
+        // Clipboard blocked (e.g. non-HTTPS) — open Claude anyway
+      }
+
+      window.open('https://claude.ai', '_blank');
+
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        label.textContent = 'Discuss in Claude.ai';
+        hint.classList.remove('visible');
+      }, 4000);
+    }
+  </script>
+
+</body>
+</html>

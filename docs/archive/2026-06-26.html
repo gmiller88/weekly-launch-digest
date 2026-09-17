@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weekly Launch Digest — June 26, 2026</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      min-height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: #f0f2f5;
+      color: #1a1a2e;
+    }
+
+    #page { max-width: 740px; margin: 0 auto; padding: 0 16px 48px; }
+
+    /* Header */
+    #digest-header {
+      background: #1a1a2e;
+      margin: 0 -16px;
+      padding: 24px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    #digest-header h1 {
+      font-size: 19px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.3px;
+    }
+
+    #digest-header .date { font-size: 12px; color: #8888aa; margin-top: 3px; }
+
+    #digest-header .archive-link {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #8899cc;
+      text-decoration: none;
+    }
+
+    #digest-header .archive-link:hover { color: #aabbee; }
+
+    /* Open in Claude button */
+    #claude-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #0055cc;
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      padding: 9px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+      flex-shrink: 0;
+    }
+
+    #claude-btn:hover { background: #0044aa; }
+    #claude-btn.copied { background: #007744; cursor: default; }
+    #claude-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    #copy-hint {
+      font-size: 11px;
+      color: #8888aa;
+      margin-top: 6px;
+      text-align: right;
+      display: none;
+    }
+
+    #copy-hint.visible { display: block; }
+
+    /* Sections */
+    .digest-section {
+      background: white;
+      border-radius: 8px;
+      padding: 24px 28px;
+      margin-top: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-label::before {
+      content: "";
+      display: inline-block;
+      width: 3px;
+      height: 14px;
+      border-radius: 2px;
+    }
+
+    .section-label.funding { color: #0055cc; }
+    .section-label.funding::before { background: #0055cc; }
+    .section-label.launches { color: #007744; }
+    .section-label.launches::before { background: #007744; }
+
+    /* ── Digest content (targets from digest/render.py) ───────────── */
+
+    .d-item {
+      margin-bottom: 32px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .d-item:last-child, .d-fund-item:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .d-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .d-title {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 600;
+      color: #1a1a2e;
+      flex: 1;
+      line-height: 1.4;
+    }
+
+    .d-score, .d-score-na {
+      display: inline-block;
+      color: white;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 700;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .d-score { background: #0055cc; font-size: 13px; }
+    .d-score-na { background: #777; font-size: 12px; }
+
+    .d-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .d-th {
+      padding: 6px 12px 6px 0;
+      vertical-align: top;
+      white-space: nowrap;
+      color: #555;
+      font-weight: 600;
+      width: 130px;
+      text-align: left;
+    }
+
+    .d-td { padding: 6px 0; color: #333; }
+    .d-table tr:nth-child(even) { background: #fafafa; }
+
+    .d-steal {
+      margin-top: 14px;
+      padding: 12px 14px;
+      background: #f2f7f4;
+      border-left: 3px solid #007744;
+      border-radius: 4px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #234;
+    }
+
+    .d-steal-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.1px;
+      text-transform: uppercase;
+      color: #007744;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .d-evidence {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #888;
+      line-height: 1.55;
+    }
+
+    .d-note {
+      font-style: italic;
+      color: #555;
+      margin-bottom: 20px;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .d-pattern {
+      margin-bottom: 24px;
+      padding: 14px 16px;
+      background: #f7f7fb;
+      border-left: 3px solid #0055cc;
+      border-radius: 4px;
+      font-size: 14px;
+      line-height: 1.7;
+      color: #333;
+    }
+
+    .d-pattern-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.1px;
+      text-transform: uppercase;
+      color: #0055cc;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .d-links { margin-top: 10px; font-size: 13px; }
+    .d-link { color: #0055cc; text-decoration: none; }
+    .d-link:hover { text-decoration: underline; }
+    .d-empty { color: #666; font-size: 14px; }
+
+    .d-fund-item {
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .d-fund-title {
+      margin: 0 0 8px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #1a1a2e;
+    }
+
+    .d-fund-body {
+      margin: 0 0 10px;
+      line-height: 1.65;
+      color: #333;
+      font-size: 14px;
+    }
+
+    /* Archive index */
+    .archive-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .archive-row:last-child { border-bottom: none; }
+    .archive-row a { color: #0055cc; text-decoration: none; font-weight: 600; font-size: 15px; }
+    .archive-row a:hover { text-decoration: underline; }
+    .archive-row .meta { font-size: 12px; color: #888; }
+
+    @media (max-width: 560px) {
+      .d-table, .d-table tbody, .d-table tr, .d-th, .d-td { display: block; width: auto; }
+      .d-th { padding-bottom: 0; }
+      .d-td { padding-top: 2px; padding-bottom: 10px; }
+      .d-table tr:nth-child(even) { background: transparent; }
+    }
+  </style>
+</head>
+<body>
+  <div id="page">
+
+    <div id="digest-header">
+      <div>
+        <h1>Weekly Launch Digest</h1>
+        <div class="date">Week ending June 26, 2026</div>
+        <a class="archive-link" href="../archive.html">Browse past weeks &rarr;</a>
+      </div>
+      <div>
+        <button id="claude-btn" onclick="openInClaude()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <span id="btn-label">Discuss in Claude.ai</span>
+        </button>
+        <div id="copy-hint">Digest copied &mdash; just paste into Claude.ai</div>
+      </div>
+    </div>
+
+    <div class="digest-section">
+      <div class="section-label launches">Top B2B Product Launches</div>
+      <p style="font-style: italic; color: #555; margin-bottom: 24px; font-size: 14px;"><strong>Analyst Note:</strong> This was a notably thin week for B2B software product launches. The article set is dominated by financial news, consumer marketing coverage from Cannes Lions, and space industry stories — with very little that meets the bar for a dedicated product launch campaign with meaningful market impact. The few B2B-adjacent launches that do appear (PitchBook's Microsoft 365 integration, RedotPay's merchant gateway, Mira Commerce's ForgeB2B) are modest in scope and lightly covered. Flagging this as a slow week; only two entries comfortably clear the qualification threshold, with a third included cautiously.</p>
+
+<div class="launch-item" style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #eee;">
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
+    <h3 style="margin: 0; font-size: 17px; font-weight: 600; color: #1a1a2e; flex: 1;">PitchBook — Microsoft 365 Copilot & Excel AI Integration</h3>
+    <span style="display: inline-block; background: #0055cc; color: white; padding: 3px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-left: 12px; white-space: nowrap;">6/10</span>
+  </div>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.65;">
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600; width: 130px;">Company</td>
+      <td style="padding: 6px 0; color: #333;">PitchBook is Morningstar's private market data and research platform, serving venture capital, private equity, and corporate development professionals globally. It is one of the most widely used deal intelligence tools in the financial sector.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">The Launch</td>
+      <td style="padding: 6px 0; color: #333;">PitchBook expanded its AI integrations to surface private market data and deal intelligence directly inside Microsoft 365 Copilot and Copilot in Excel — letting analysts query PitchBook's proprietary dataset without leaving their existing productivity workflow.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Product Fit</td>
+      <td style="padding: 6px 0; color: #333;">A logical and well-reasoned extension of PitchBook's data moat. Their core value has always been data quality and depth; embedding that into the tools where analysts already live (Excel for modeling, Copilot for synthesis) reduces friction without cannibalizing the core platform. Fits their strengths cleanly.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Launch Playbook</td>
+      <td style="padding: 6px 0; color: #333;">Distributed via press release picked up by Yahoo Finance. Leaned on a named executive quote (EVP of Technology and Engineering) for credibility. Launch benefited from the Microsoft Copilot halo — riding an established platform rather than building its own launch momentum. No visible conference tie-in, influencer seeding, or customer co-announcement detected.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Messaging</td>
+      <td style="padding: 6px 0; color: #333;">Anchored on a "trusted data as the foundation for AI" narrative — a smart and defensible angle given broad anxiety about LLM hallucinations in financial contexts. Framing around "question to insight" is clean. Notably avoided making specific accuracy or ROI claims, which is prudent but leaves the value proposition slightly abstract.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Why This Rating</td>
+      <td style="padding: 6px 0; color: #333;">The integration itself is strategically sound and the data-quality messaging is differentiated in a noisy AI market. However, the launch relied almost entirely on a wire release with no visible activation campaign, customer proof points, or amplification strategy — leaving meaningful earned media and community buzz on the table. A stronger week would have pushed this to the middle of the pack rather than the top.</td>
+    </tr>
+  </table>
+
+  <div style="margin-top: 10px;">
+    <a href="https://sg.finance.yahoo.com/news/pitchbook-expands-premium-ai-integrations-131500268.html" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+  </div>
+</div>
+
+<div class="launch-item" style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #eee;">
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
+    <h3 style="margin: 0; font-size: 17px; font-weight: 600; color: #1a1a2e; flex: 1;">RedotPay — RedotPay Connect B2B Merchant Gateway</h3>
+    <span style="display: inline-block; background: #0055cc; color: white; padding: 3px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-left: 12px; white-space: nowrap;">5/10</span>
+  </div>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.65;">
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600; width: 130px;">Company</td>
+      <td style="padding: 6px 0; color: #333;">RedotPay is a crypto-native fintech platform targeting Gen Z consumers and global merchants, operating a consumer wallet with over 700 million claimed addressable crypto users. This is their first formal B2B product offering.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">The Launch</td>
+      <td style="padding: 6px 0; color: #333;">RedotPay Connect is a B2B payment gateway that lets merchants accept crypto payments from RedotPay's consumer network while reducing merchant processing fees by up to 70% compared to traditional payment rails — settling on real-time global infrastructure.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Product Fit</td>
+      <td style="padding: 6px 0; color: #333;">A genuine category expansion: RedotPay is pivoting from a consumer wallet to a two-sided B2B platform. The logic is sound — monetize the consumer network by opening it to merchants — but this is a meaningful strategic stretch. B2B payments require different compliance, sales motion, and integration complexity than a consumer app.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Launch Playbook</td>
+      <td style="padding: 6px 0; color: #333;">Coverage landed in The Fintech Times, a relevant trade publication for this audience. Launch was supported by a named co-founder quote and a clear product name ("RedotPay Connect"). No partner merchant announcements, no demo, no waitlist mechanic, and no broader press campaign detected beyond the single trade placement.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Messaging</td>
+      <td style="padding: 6px 0; color: #333;">Led with a sharp, quotable frame: "We didn't just build a gateway; we built a bridge." The 70% fee reduction claim is a concrete, attention-grabbing number that cuts through in a commoditized space. Smartly avoided leaning too hard on crypto volatility angles; instead emphasized access to a demographic (Gen Z, crypto-native) as the merchant value driver.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Why This Rating</td>
+      <td style="padding: 6px 0; color: #333;">The messaging is punchy and the market opportunity is real, but the launch execution was minimal — a single trade article with no visible activation, customer proof, or community amplification. The 70% fee claim needed a merchant case study or pilot announcement to earn trust; without it, the number reads as marketing copy rather than validated proof. Solid concept, underinvested launch.</td>
+    </tr>
+  </table>
+
+  <div style="margin-top: 10px;">
+    <a href="https://thefintechtimes.com/bridging-the-gen-z-ledger-redotpay-unveils-b2b-gateway-to-cut-merchant-fees-by-70/" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+  </div>
+</div>
+
+<div class="launch-item" style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #eee;">
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
+    <h3 style="margin: 0; font-size: 17px; font-weight: 600; color: #1a1a2e; flex: 1;">Mira Commerce — ForgeB2B Website Accelerator</h3>
+    <span style="display: inline-block; background: #0055cc; color: white; padding: 3px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-left: 12px; white-space: nowrap;">4/10</span>
+  </div>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.65;">
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600; width: 130px;">Company</td>
+      <td style="padding: 6px 0; color: #333;">Mira Commerce is a boutique agency specializing in enterprise ecommerce implementations and integrations. This launch represents their first packaged product offering aimed at reducing time-to-market for B2B merchants.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">The Launch</td>
+      <td style="padding: 6px 0; color: #333;">ForgeB2B is a pre-integrated website accelerator for B2B ecommerce — a pre-built foundation with design skins, native AI-powered quoting, smart catalog search, and buyer dashboards, allowing merchants to bypass building from scratch and compress go-live timelines significantly.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Product Fit</td>
+      <td style="padding: 6px 0; color: #333;">A natural productization of what Mira Commerce already does as an agency — packaging their implementation expertise into a repeatable accelerator. The risk is the classic agency-to-product transition challenge: sales motion, support, and pricing models are fundamentally different, and the article gives no indication they've addressed this.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Launch Playbook</td>
+      <td style="padding: 6px 0; color: #333;">A brief mention in Practical Ecommerce's weekly "New Ecommerce Tools" roundup — a relevant but low-reach trade vehicle. No dedicated press release, no named customer, no demo video, no Product Hunt listing, and no social amplification detected. Launch effectively piggybacks on a curated list rather than standing on its own.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Messaging</td>
+      <td style="padding: 6px 0; color: #333;">Led with the "bypass building from scratch" angle — a time-to-value message that resonates with resource-constrained B2B merchants. Feature callouts (AI quoting, smart catalog search) are relevant but listed without differentiation context. No clear narrative arc or competitive positioning is evident from the coverage.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Why This Rating</td>
+      <td style="padding: 6px 0; color: #333;">Included as the third entry primarily because the product concept is genuinely useful for the B2B ecommerce segment and the feature set is real — not because the launch execution earned it. The total absence of a launch campaign, customer validation, or owned media strategy means almost no one outside of Practical Ecommerce readers will have seen this. In a stronger week, this would not qualify.</td>
+    </tr>
+  </table>
+
+  <div style="margin-top: 10px;">
+    <a href="https://www.practicalecommerce.com/new-ecommerce-tools-june-24-2026" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+    </div>
+
+    <div class="digest-section">
+      <div class="section-label funding">VC Funding Announcements</div>
+      <div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Sail Research</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Sail Research raised $80 million in combined Seed and Series A funding, valuing the company at $450 million. The round was led by Kleiner Perkins and Sequoia Capital. The San Francisco-based company builds infrastructure for long-horizon AI agents. Funds will support development of its agent infrastructure platform.</p>
+  <a href="https://www.thesaasnews.com/news/sail-research-raises-80m-series-a/" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Mirendil</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Mirendil, a San Francisco-based AI startup founded by Anthropic veterans, raised $200 million at a $1 billion valuation. The round was backed by Andreessen Horowitz (a16z), Kleiner Perkins, and Nvidia. No specific use of funds was disclosed in the available reporting.</p>
+  <a href="https://www.axios.com/pro/all-deals/2026/06/24/pro-rata-premium-first-look-stegra-thoma-bravo-taktile" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Fomo</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Fomo, an on-chain trading platform for retail investors, raised $75 million in a Series B round that values the company at $550 million. The round was led by Index Ventures, with participation from Union Square Ventures and existing investor Benchmark, which had led Fomo's $17 million Series A in November. The platform allows users to trade digital tokens across blockchains without managing crypto wallets, paying gas fees, or manually transferring assets.</p>
+  <a href="https://www.fintechfutures.com/venture-capital-funding/fomo-lands-75m-series-b" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Smart Bricks</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Smart Bricks raised $5 million in a pre-seed round led by Andreessen Horowitz via its a16z Speedrun program, with additional participation from South Loop Ventures, Cornerstone VC, Techstars, and angel investors from OpenAI, Airbnb, Anthropic, Blackstone, and DeepMind. The company plans to use the capital to expand its product infrastructure into new markets beyond the United States, United Kingdom, and UAE, and to advance product development.</p>
+  <a href="https://www.thesaasnews.com/news/smart-bricks-raises-5m-pre-seed/" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+    </div>
+
+  </div>
+
+  <script>
+    const CONTEXT_PROMPT = `This is the archived Weekly Launch Digest for the week ending June 26, 2026.`;
+
+    async function openInClaude() {
+      const btn = document.getElementById('claude-btn');
+      const label = document.getElementById('btn-label');
+      const hint = document.getElementById('copy-hint');
+
+      try {
+        await navigator.clipboard.writeText(CONTEXT_PROMPT);
+        btn.classList.add('copied');
+        label.textContent = 'Copied!';
+        hint.classList.add('visible');
+      } catch (e) {
+        // Clipboard blocked (e.g. non-HTTPS) — open Claude anyway
+      }
+
+      window.open('https://claude.ai', '_blank');
+
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        label.textContent = 'Discuss in Claude.ai';
+        hint.classList.remove('visible');
+      }, 4000);
+    }
+  </script>
+
+</body>
+</html>

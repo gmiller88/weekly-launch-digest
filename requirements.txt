@@ -1,3 +1,5 @@
-anthropic>=0.40.0
-tavily-python>=0.3.0
+# output_config (structured outputs) and adaptive thinking require a recent SDK.
+anthropic>=0.97.0
+# extract() and include_raw_content are used for primary-source research.
+tavily-python>=0.7.0
 python-dotenv>=1.0.0

@@ -3,17 +3,24 @@ from datetime import datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+from . import render
+
 
 def send_digest_email(
     gmail_user: str,
     gmail_app_password: str,
     recipient: str,
-    funding_html: str,
-    launches_html: str,
+    funding: dict,
+    launches: dict,
     site_url: str | None = None,
+    date_label: str | None = None,
 ) -> None:
-    today = datetime.now().strftime("%B %d, %Y")
+    today = date_label or datetime.now().strftime("%B %d, %Y")
     subject = f"Weekly Launch Digest — {today}"
+
+    # Inline styles throughout: Gmail strips <style> blocks.
+    funding_html = render.render_funding(funding, email=True)
+    launches_html = render.render_launches(launches, email=True)
 
     html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -29,28 +36,26 @@ def send_digest_email(
     <div style="background: #1a1a2e; border-radius: 8px 8px 0 0; padding: 28px 32px; margin-bottom: 0;">
       <h1 style="margin: 0 0 4px; font-size: 22px; font-weight: 700; color: #ffffff; letter-spacing: -0.3px;">Weekly Launch Digest</h1>
       <p style="margin: 0; color: #8888aa; font-size: 13px;">Week ending {today}</p>
-      {f'<a href="{site_url}" style="display: inline-block; margin-top: 14px; background: #0055cc; color: white; font-size: 12px; font-weight: 600; padding: 7px 14px; border-radius: 5px; text-decoration: none;">Ask Claude follow-up questions &rarr;</a>' if site_url else ''}
+      {f'<a href="{site_url}" style="display: inline-block; margin-top: 14px; background: #0055cc; color: white; font-size: 12px; font-weight: 600; padding: 7px 14px; border-radius: 5px; text-decoration: none;">Open the web edition &rarr;</a>' if site_url else ''}
     </div>
 
     <!-- Body -->
     <div style="background: white; border-radius: 0 0 8px 8px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
 
-      <!-- Funding section -->
-      <div style="margin-bottom: 40px;">
-        <div style="display: flex; align-items: center; margin-bottom: 20px;">
-          <div style="width: 4px; height: 20px; background: #0055cc; border-radius: 2px; margin-right: 10px;"></div>
-          <h2 style="margin: 0; font-size: 13px; font-weight: 700; color: #0055cc; text-transform: uppercase; letter-spacing: 1px;">VC Funding Announcements</h2>
-        </div>
-        {funding_html}
-      </div>
-
       <!-- Launches section -->
-      <div>
-        <div style="display: flex; align-items: center; margin-bottom: 20px;">
-          <div style="width: 4px; height: 20px; background: #007744; border-radius: 2px; margin-right: 10px;"></div>
-          <h2 style="margin: 0; font-size: 13px; font-weight: 700; color: #007744; text-transform: uppercase; letter-spacing: 1px;">Top B2B Product Launches</h2>
+      <div style="margin-bottom: 40px;">
+        <div style="margin-bottom: 20px;">
+          <h2 style="margin: 0; font-size: 13px; font-weight: 700; color: #007744; text-transform: uppercase; letter-spacing: 1px; border-left: 4px solid #007744; padding-left: 10px;">Top B2B Product Launches</h2>
         </div>
         {launches_html}
+      </div>
+
+      <!-- Funding section -->
+      <div>
+        <div style="margin-bottom: 20px;">
+          <h2 style="margin: 0; font-size: 13px; font-weight: 700; color: #0055cc; text-transform: uppercase; letter-spacing: 1px; border-left: 4px solid #0055cc; padding-left: 10px;">VC Funding Announcements</h2>
+        </div>
+        {funding_html}
       </div>
 
     </div>
@@ -68,6 +73,7 @@ def send_digest_email(
     msg["Subject"] = subject
     msg["From"] = gmail_user
     msg["To"] = recipient
+    msg.attach(MIMEText(render.plain_text(funding, launches), "plain"))
     msg.attach(MIMEText(html, "html"))
 
     with smtplib.SMTP("smtp.gmail.com", 587) as server:

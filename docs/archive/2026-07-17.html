@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weekly Launch Digest — July 17, 2026</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      min-height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: #f0f2f5;
+      color: #1a1a2e;
+    }
+
+    #page { max-width: 740px; margin: 0 auto; padding: 0 16px 48px; }
+
+    /* Header */
+    #digest-header {
+      background: #1a1a2e;
+      margin: 0 -16px;
+      padding: 24px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    #digest-header h1 {
+      font-size: 19px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.3px;
+    }
+
+    #digest-header .date { font-size: 12px; color: #8888aa; margin-top: 3px; }
+
+    #digest-header .archive-link {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #8899cc;
+      text-decoration: none;
+    }
+
+    #digest-header .archive-link:hover { color: #aabbee; }
+
+    /* Open in Claude button */
+    #claude-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #0055cc;
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      padding: 9px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+      flex-shrink: 0;
+    }
+
+    #claude-btn:hover { background: #0044aa; }
+    #claude-btn.copied { background: #007744; cursor: default; }
+    #claude-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    #copy-hint {
+      font-size: 11px;
+      color: #8888aa;
+      margin-top: 6px;
+      text-align: right;
+      display: none;
+    }
+
+    #copy-hint.visible { display: block; }
+
+    /* Sections */
+    .digest-section {
+      background: white;
+      border-radius: 8px;
+      padding: 24px 28px;
+      margin-top: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-label::before {
+      content: "";
+      display: inline-block;
+      width: 3px;
+      height: 14px;
+      border-radius: 2px;
+    }
+
+    .section-label.funding { color: #0055cc; }
+    .section-label.funding::before { background: #0055cc; }
+    .section-label.launches { color: #007744; }
+    .section-label.launches::before { background: #007744; }
+
+    /* ── Digest content (targets from digest/render.py) ───────────── */
+
+    .d-item {
+      margin-bottom: 32px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .d-item:last-child, .d-fund-item:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .d-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .d-title {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 600;
+      color: #1a1a2e;
+      flex: 1;
+      line-height: 1.4;
+    }
+
+    .d-score, .d-score-na {
+      display: inline-block;
+      color: white;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 700;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .d-score { background: #0055cc; font-size: 13px; }
+    .d-score-na { background: #777; font-size: 12px; }
+
+    .d-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .d-th {
+      padding: 6px 12px 6px 0;
+      vertical-align: top;
+      white-space: nowrap;
+      color: #555;
+      font-weight: 600;
+      width: 130px;
+      text-align: left;
+    }
+
+    .d-td { padding: 6px 0; color: #333; }
+    .d-table tr:nth-child(even) { background: #fafafa; }
+
+    .d-steal {
+      margin-top: 14px;
+      padding: 12px 14px;
+      background: #f2f7f4;
+      border-left: 3px solid #007744;
+      border-radius: 4px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #234;
+    }
+
+    .d-steal-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.1px;
+      text-transform: uppercase;
+      color: #007744;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .d-evidence {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #888;
+      line-height: 1.55;
+    }
+
+    .d-note {
+      font-style: italic;
+      color: #555;
+      margin-bottom: 20px;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .d-pattern {
+      margin-bottom: 24px;
+      padding: 14px 16px;
+      background: #f7f7fb;
+      border-left: 3px solid #0055cc;
+      border-radius: 4px;
+      font-size: 14px;
+      line-height: 1.7;
+      color: #333;
+    }
+
+    .d-pattern-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.1px;
+      text-transform: uppercase;
+      color: #0055cc;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .d-links { margin-top: 10px; font-size: 13px; }
+    .d-link { color: #0055cc; text-decoration: none; }
+    .d-link:hover { text-decoration: underline; }
+    .d-empty { color: #666; font-size: 14px; }
+
+    .d-fund-item {
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .d-fund-title {
+      margin: 0 0 8px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #1a1a2e;
+    }
+
+    .d-fund-body {
+      margin: 0 0 10px;
+      line-height: 1.65;
+      color: #333;
+      font-size: 14px;
+    }
+
+    /* Archive index */
+    .archive-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .archive-row:last-child { border-bottom: none; }
+    .archive-row a { color: #0055cc; text-decoration: none; font-weight: 600; font-size: 15px; }
+    .archive-row a:hover { text-decoration: underline; }
+    .archive-row .meta { font-size: 12px; color: #888; }
+
+    @media (max-width: 560px) {
+      .d-table, .d-table tbody, .d-table tr, .d-th, .d-td { display: block; width: auto; }
+      .d-th { padding-bottom: 0; }
+      .d-td { padding-top: 2px; padding-bottom: 10px; }
+      .d-table tr:nth-child(even) { background: transparent; }
+    }
+  </style>
+</head>
+<body>
+  <div id="page">
+
+    <div id="digest-header">
+      <div>
+        <h1>Weekly Launch Digest</h1>
+        <div class="date">Week ending July 17, 2026</div>
+        <a class="archive-link" href="../archive.html">Browse past weeks &rarr;</a>
+      </div>
+      <div>
+        <button id="claude-btn" onclick="openInClaude()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <span id="btn-label">Discuss in Claude.ai</span>
+        </button>
+        <div id="copy-hint">Digest copied &mdash; just paste into Claude.ai</div>
+      </div>
+    </div>
+
+    <div class="digest-section">
+      <div class="section-label launches">Top B2B Product Launches</div>
+      <p style="font-style: italic; color: #555; margin-bottom: 24px; font-size: 14px;"><strong>Analyst Note:</strong> This was a notably thin week for qualifying B2B software launches. The article set skews heavily toward consumer tech, financial news, and venture funding roundups — none of which meet the threshold. Only two entries clear the bar as genuine B2B software product launches with meaningful market context: Vibes' RCS Studio Professional and Esri's ArcGIS Velocity for Enterprise. A third, Beehiiv's Community + AI Copilot, is included as a borderline B2B/creator-economy play given the TechCrunch coverage and its clear implications for B2B newsletter operators, but it's worth flagging that this is a slow week — not one to draw broad strategic conclusions from.</p>
+
+<div class="launch-item" style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #eee;">
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
+    <h3 style="margin: 0; font-size: 17px; font-weight: 600; color: #1a1a2e; flex: 1;">Vibes — RCS Studio Professional</h3>
+    <span style="display: inline-block; background: #0055cc; color: white; padding: 3px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-left: 12px; white-space: nowrap;">7/10</span>
+  </div>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.65;">
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600; width: 130px;">Company</td>
+      <td style="padding: 6px 0; color: #333;">Vibes is a mobile messaging platform and the only independent direct-connect aggregator in the U.S., serving enterprise and mid-market brands with SMS, MMS, and now RCS capabilities. They are a growth-stage company with deep carrier relationships built over more than two decades.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">The Launch</td>
+      <td style="padding: 6px 0; color: #333;">RCS Studio Professional is positioned as the first self-serve RCS (Rich Communication Services) messaging platform that lets any business sign up, pay by credit card, and send a test message in under five minutes — no developers required, no carrier negotiations, and no six-month onboarding timeline. Vibes handles all carrier verification and agent approval in the background, with most customers going live within approximately two weeks.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Product Fit</td>
+      <td style="padding: 6px 0; color: #333;">This is a natural and well-timed extension of Vibes' core SMS/MMS business. Their direct-connect aggregator status is a genuine structural moat here — competitors without carrier relationships simply cannot replicate the frictionless onboarding story. The self-serve motion also opens a new mid-market and SMB segment that their enterprise sales model would never efficiently reach.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Launch Playbook</td>
+      <td style="padding: 6px 0; color: #333;">Distributed via press release through WebWire with a product-led growth hook at the center (sign up with a credit card, live in under five minutes). The "under five minutes to first test message" framing is a clear product demo/trial mechanic designed to reduce friction and let the product sell itself. No conference slot or major media embargo was evident, which caps the ceiling on this launch's reach.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Messaging</td>
+      <td style="padding: 6px 0; color: #333;">The core narrative is "RCS without the complexity" — they lean hard into the pain of traditional RCS onboarding (six months, developers, carrier negotiations) and position themselves as the antidote. Notably, they also frame the platform as compatible with AI agents sending messages, which is a smart forward-looking hook without making AI the headline. The "first self-serve RCS platform" claim establishes a category-of-one position that will be hard for trade press to ignore.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Why This Rating</td>
+      <td style="padding: 6px 0; color: #333;">The product-market fit and messaging clarity are genuinely strong — the "first self-serve RCS platform" claim is defensible and the under-five-minutes mechanic is a textbook PLG activation hook. What pulls the score down is distribution: a WebWire press release is a low-amplification channel for a launch that deserves Tier-1 trade coverage in MarTech or mobile commerce publications. There's real buzz potential here that appears to have been left on the table.</td>
+    </tr>
+  </table>
+
+  <div style="margin-top: 10px;">
+    <a href="https://www.webwire.com/ViewPressRel.asp?aId=357714" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+  </div>
+</div>
+
+<div class="launch-item" style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #eee;">
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
+    <h3 style="margin: 0; font-size: 17px; font-weight: 600; color: #1a1a2e; flex: 1;">Esri — ArcGIS Velocity for ArcGIS Enterprise</h3>
+    <span style="display: inline-block; background: #0055cc; color: white; padding: 3px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-left: 12px; white-space: nowrap;">6/10</span>
+  </div>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.65;">
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600; width: 130px;">Company</td>
+      <td style="padding: 6px 0; color: #333;">Esri is the dominant incumbent in GIS (Geographic Information System) software, serving government agencies, defense, utilities, transportation, and enterprise organizations globally. Their ArcGIS platform is the de facto standard for spatial analytics, with a decades-long installed base across both cloud (ArcGIS Online) and on-premise (ArcGIS Enterprise) deployments.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">The Launch</td>
+      <td style="padding: 6px 0; color: #333;">Esri has extended ArcGIS Velocity — its real-time data streaming and IoT analytics capability, previously only available in their SaaS product — to self-hosted ArcGIS Enterprise deployments. This directly replaces ArcGIS GeoEvent Server, consolidating two previously separate products into a unified real-time workflow experience regardless of deployment model.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Product Fit</td>
+      <td style="padding: 6px 0; color: #333;">Strong strategic fit. Many of Esri's most critical customers — defense, utilities, and regulated industries — are locked into on-premise deployments for compliance or security reasons and have been unable to access Velocity's real-time capabilities. This closes a long-standing feature gap between SaaS and Enterprise tiers and removes a meaningful objection for customers evaluating whether to consolidate their geospatial stack on ArcGIS.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Launch Playbook</td>
+      <td style="padding: 6px 0; color: #333;">Coverage surfaced in Engineering.com, a relevant trade publication for Esri's engineering and infrastructure audience. The launch does not appear to have been tied to a conference keynote or accompanied by a major press push. Given that this is a product retirement (GeoEvent Server) alongside a feature promotion, it may have been treated more as a product transition than a marquee launch — which is arguably a missed framing opportunity.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Messaging</td>
+      <td style="padding: 6px 0; color: #333;">The framing centers on "consistent experience across deployment models," which is technically accurate but somewhat flat from a PMM standpoint. The more compelling narrative — enabling real-time IoT and streaming analytics for security-sensitive organizations that can't use the cloud — is present but underdeveloped. The GeoEvent Server retirement is treated as a footnote rather than a migration opportunity story that could drive urgency among the installed base.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Why This Rating</td>
+      <td style="padding: 6px 0; color: #333;">This is a genuinely meaningful platform expansion for a significant installed base of enterprise and government customers, and the product decision itself is sound. The score is held back by execution that feels more like a changelog announcement than a strategic launch — there's no apparent urgency narrative, customer co-announcement, or activation strategy for GeoEvent Server users who need to migrate. For an incumbent with Esri's reach, this deserved a bigger moment.</td>
+    </tr>
+  </table>
+
+  <div style="margin-top: 10px;">
+    <a href="https://www.engineering.com/esri-releases-arcgis-velocity-for-self-hosted-use/" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+  </div>
+</div>
+
+<div class="launch-item" style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #eee;">
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
+    <h3 style="margin: 0; font-size: 17px; font-weight: 600; color: #1a1a2e; flex: 1;">Beehiiv — Community + AI Copilot</h3>
+    <span style="display: inline-block; background: #0055cc; color: white; padding: 3px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-left: 12px; white-space: nowrap;">6/10</span>
+  </div>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.65;">
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600; width: 130px;">Company</td>
+      <td style="padding: 6px 0; color: #333;">Beehiiv is a growth-stage newsletter and creator monetization platform, competing with Substack and Ghost for professional and enterprise newsletter operators. They have been aggressively expanding beyond email with podcasts, webinars, and paywalls, signaling ambition to become a full creator operating system — with clear B2B use cases for media companies, agencies, and brand-owned editorial operations.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">The Launch</td>
+      <td style="padding: 6px 0; color: #333;">Beehiiv launched two features simultaneously: Community, which enables subscribers of a newsletter to chat with each other (creating a social layer inside owned media), and AI Copilot, an AI assistant that helps operators manage and grow their audience. Together, they mark Beehiiv's clearest push yet toward being a platform rather than a publishing tool.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Product Fit</td>
+      <td style="padding: 6px 0; color: #333;">Community is a logical but contested expansion — it moves Beehiiv into territory occupied by Discord, Circle, and Slack for community, while AI Copilot aligns with a clear market expectation that every SaaS tool now ships an AI assistant. The 50% podcast migration stat they cited is a strong proof point that their platform expansion strategy is showing real retention and switching behavior, lending credibility to Community as the next logical step.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Launch Playbook</td>
+      <td style="padding: 6px 0; color: #333;">Secured dedicated TechCrunch coverage, which is the standout distribution win here and the primary reason this makes the list. The article does useful work framing Beehiiv's broader platform narrative, not just the individual features. No evidence of a conference slot, influencer seeding, or Product Hunt activation — and the dual-feature launch (Community + AI Copilot) risks diluting the message by asking readers to process two distinct value propositions at once.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Messaging</td>
+      <td style="padding: 6px 0; color: #333;">Beehiiv is threading a "beyond newsletters" narrative that gives the launch a clear strategic frame — these aren't just features, they're evidence of a platform transformation. That's smart PMM storytelling.
+    </div>
+
+    <div class="digest-section">
+      <div class="section-label funding">VC Funding Announcements</div>
+      <div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Chai Discovery</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Chai Discovery raised a $400 million Series C round, valuing the AI drug discovery company at $3.8 billion. The round was led by Index Ventures alongside Kleiner Perkins and Sequoia Capital, with additional participation from General Catalyst, Bain Capital Ventures, Battery Ventures, Baillie Gifford, and others. Existing investors Thrive Capital and OpenAI also joined. The company develops AI-driven molecular design software intended to accelerate the process from digital concept to physical drug validation.</p>
+  <a href="https://www.biospace.com/press-releases/chai-discovery-announces-400m-series-c-to-advance-ai-driven-molecular-design" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Oak</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Israeli identity management startup Oak emerged from stealth with $60 million in seed funding. The round was co-led by Accel, CRV, and Greylock Partners, with participation from AlphaDrive Ventures and Hetz Ventures. Oak is building an identity platform focused on securing AI agent interactions, addressing what it describes as a growing identity management problem created by the proliferation of autonomous agents.</p>
+  <a href="https://techcrunch.com/2026/07/15/backed-by-60m-in-funding-oak-steps-out-of-stealth-to-fix-the-identity-mess-that-ai-agents-are-making-worse" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">TerraFirma</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Austin-based construction tech startup TerraFirma raised $115 million in a funding round. Kleiner Perkins participated alongside Bain Capital Ventures and strategic investors SpaceX, Anduril, and Hadrian. Founded by former SpaceX engineers, the two-year-old company develops remote-controlled construction equipment using interfaces including standard game controllers, and is positioning its technology for both terrestrial and potential interplanetary infrastructure use.</p>
+  <a href="https://www.cnbc.com/2026/07/14/terrafirma-construction-tech-spacex.html" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Neo Security</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Israeli cybersecurity startup Neo Security, founded by former SentinelOne executives, closed a new round of more than $50 million. The company's 2025 seed round of $25 million was led by Andreessen Horowitz (a16z), making a16z a prior top-tier investor in this new raise. Kraft Group joined the investor syndicate in the latest financing. The company has not publicly disclosed its specific product focus, operating in stealth mode.</p>
+  <a href="https://www.calcalistech.com/ctechnews/article/s1ukhnnvzg" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Valarian</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">UK-based sovereign infrastructure company Valarian raised $50 million in a Series A round led by New Enterprise Associates (NEA). No valuation was disclosed. Valarian focuses on building secure infrastructure for government and sovereign clients. No additional use-of-funds detail was provided in the available reporting.</p>
+  <a href="https://thecyberwire.com/newsletters/business-briefing/8/28" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">QIZ Security</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Israeli post-quantum cryptography management platform QIZ Security raised $17 million in seed funding. The round was led by Bessemer Venture Partners alongside Merlin Ventures. QIZ Security builds tooling to help organizations manage cryptographic assets in anticipation of quantum computing threats. No valuation was disclosed.</p>
+  <a href="https://thecyberwire.com/newsletters/business-briefing/8/28" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Feathery</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">US-based wealthtech startup Feathery closed a Series A round, bringing its total funding to $30 million since its 2021 seed raise. The Series A was led by Portage Ventures, with Index Ventures participating as a returning seed investor. Feathery provides an operating and decisioning platform for financial services workflows. No new valuation was disclosed.</p>
+  <a href="https://www.fintechfutures.com/venture-capital-funding/wealthtech-feathery-series-a-30m-total-funding" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Axle Energy</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">UK-based virtual power plant operator Axle Energy raised €21 million in a Series A round led by Energize Capital. Accel participated as a returning insider investor from a prior round. The company aggregates distributed energy assets to provide grid flexibility services. No new valuation was disclosed.</p>
+  <a href="https://www.axios.com/pro/climate-deals/2026/07/11/energy-climate-deals-vc-pe-ipos-july-6" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+    </div>
+
+  </div>
+
+  <script>
+    const CONTEXT_PROMPT = `This is the archived Weekly Launch Digest for the week ending July 17, 2026.`;
+
+    async function openInClaude() {
+      const btn = document.getElementById('claude-btn');
+      const label = document.getElementById('btn-label');
+      const hint = document.getElementById('copy-hint');
+
+      try {
+        await navigator.clipboard.writeText(CONTEXT_PROMPT);
+        btn.classList.add('copied');
+        label.textContent = 'Copied!';
+        hint.classList.add('visible');
+      } catch (e) {
+        // Clipboard blocked (e.g. non-HTTPS) — open Claude anyway
+      }
+
+      window.open('https://claude.ai', '_blank');
+
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        label.textContent = 'Discuss in Claude.ai';
+        hint.classList.remove('visible');
+      }, 4000);
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weekly Launch Digest — June 05, 2026</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      min-height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: #f0f2f5;
+      color: #1a1a2e;
+    }
+
+    #page { max-width: 740px; margin: 0 auto; padding: 0 16px 48px; }
+
+    /* Header */
+    #digest-header {
+      background: #1a1a2e;
+      margin: 0 -16px;
+      padding: 24px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    #digest-header h1 {
+      font-size: 19px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.3px;
+    }
+
+    #digest-header .date { font-size: 12px; color: #8888aa; margin-top: 3px; }
+
+    #digest-header .archive-link {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #8899cc;
+      text-decoration: none;
+    }
+
+    #digest-header .archive-link:hover { color: #aabbee; }
+
+    /* Open in Claude button */
+    #claude-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #0055cc;
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      padding: 9px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+      flex-shrink: 0;
+    }
+
+    #claude-btn:hover { background: #0044aa; }
+    #claude-btn.copied { background: #007744; cursor: default; }
+    #claude-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    #copy-hint {
+      font-size: 11px;
+      color: #8888aa;
+      margin-top: 6px;
+      text-align: right;
+      display: none;
+    }
+
+    #copy-hint.visible { display: block; }
+
+    /* Sections */
+    .digest-section {
+      background: white;
+      border-radius: 8px;
+      padding: 24px 28px;
+      margin-top: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-label::before {
+      content: "";
+      display: inline-block;
+      width: 3px;
+      height: 14px;
+      border-radius: 2px;
+    }
+
+    .section-label.funding { color: #0055cc; }
+    .section-label.funding::before { background: #0055cc; }
+    .section-label.launches { color: #007744; }
+    .section-label.launches::before { background: #007744; }
+
+    /* ── Digest content (targets from digest/render.py) ───────────── */
+
+    .d-item {
+      margin-bottom: 32px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .d-item:last-child, .d-fund-item:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .d-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .d-title {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 600;
+      color: #1a1a2e;
+      flex: 1;
+      line-height: 1.4;
+    }
+
+    .d-score, .d-score-na {
+      display: inline-block;
+      color: white;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 700;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .d-score { background: #0055cc; font-size: 13px; }
+    .d-score-na { background: #777; font-size: 12px; }
+
+    .d-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .d-th {
+      padding: 6px 12px 6px 0;
+      vertical-align: top;
+      white-space: nowrap;
+      color: #555;
+      font-weight: 600;
+      width: 130px;
+      text-align: left;
+    }
+
+    .d-td { padding: 6px 0; color: #333; }
+    .d-table tr:nth-child(even) { background: #fafafa; }
+
+    .d-steal {
+      margin-top: 14px;
+      padding: 12px 14px;
+      background: #f2f7f4;
+      border-left: 3px solid #007744;
+      border-radius: 4px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #234;
+    }
+
+    .d-steal-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.1px;
+      text-transform: uppercase;
+      color: #007744;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .d-evidence {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #888;
+      line-height: 1.55;
+    }
+
+    .d-note {
+      font-style: italic;
+      color: #555;
+      margin-bottom: 20px;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .d-pattern {
+      margin-bottom: 24px;
+      padding: 14px 16px;
+      background: #f7f7fb;
+      border-left: 3px solid #0055cc;
+      border-radius: 4px;
+      font-size: 14px;
+      line-height: 1.7;
+      color: #333;
+    }
+
+    .d-pattern-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.1px;
+      text-transform: uppercase;
+      color: #0055cc;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .d-links { margin-top: 10px; font-size: 13px; }
+    .d-link { color: #0055cc; text-decoration: none; }
+    .d-link:hover { text-decoration: underline; }
+    .d-empty { color: #666; font-size: 14px; }
+
+    .d-fund-item {
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .d-fund-title {
+      margin: 0 0 8px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #1a1a2e;
+    }
+
+    .d-fund-body {
+      margin: 0 0 10px;
+      line-height: 1.65;
+      color: #333;
+      font-size: 14px;
+    }
+
+    /* Archive index */
+    .archive-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .archive-row:last-child { border-bottom: none; }
+    .archive-row a { color: #0055cc; text-decoration: none; font-weight: 600; font-size: 15px; }
+    .archive-row a:hover { text-decoration: underline; }
+    .archive-row .meta { font-size: 12px; color: #888; }
+
+    @media (max-width: 560px) {
+      .d-table, .d-table tbody, .d-table tr, .d-th, .d-td { display: block; width: auto; }
+      .d-th { padding-bottom: 0; }
+      .d-td { padding-top: 2px; padding-bottom: 10px; }
+      .d-table tr:nth-child(even) { background: transparent; }
+    }
+  </style>
+</head>
+<body>
+  <div id="page">
+
+    <div id="digest-header">
+      <div>
+        <h1>Weekly Launch Digest</h1>
+        <div class="date">Week ending June 05, 2026</div>
+        <a class="archive-link" href="../archive.html">Browse past weeks &rarr;</a>
+      </div>
+      <div>
+        <button id="claude-btn" onclick="openInClaude()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <span id="btn-label">Discuss in Claude.ai</span>
+        </button>
+        <div id="copy-hint">Digest copied &mdash; just paste into Claude.ai</div>
+      </div>
+    </div>
+
+    <div class="digest-section">
+      <div class="section-label launches">Top B2B Product Launches</div>
+      <p style="font-style: italic; color: #555; margin-bottom: 24px; font-size: 14px;"><strong>Analyst Note:</strong> This was a notably thin week for standalone B2B software product launches — the news cycle was dominated by IPO speculation (Anthropic, SpaceX), macro market commentary, and conference preview coverage for WWDC and Microsoft Build rather than discrete, campaign-backed product launches. The most substantive B2B signal came from adjacent categories (fintech infrastructure, retail media, hospitality SaaS), but even the strongest entries this week lack the media depth or launch execution rigor that would normally merit top scores. Only two launches clear the qualifying bar with reasonable confidence; a third is included at a lower tier as the best available option in a slow cycle.</p>
+
+---
+
+<div class="launch-item" style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #eee;">
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
+    <h3 style="margin: 0; font-size: 17px; font-weight: 600; color: #1a1a2e; flex: 1;">Microsoft — Unmetered Agentic AI Models & Majorana 2 (Build 2026)</h3>
+    <span style="display: inline-block; background: #0055cc; color: white; padding: 3px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-left: 12px; white-space: nowrap;">7/10</span>
+  </div>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.65;">
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600; width: 130px;">Company</td>
+      <td style="padding: 6px 0; color: #333;">Microsoft is a global enterprise software and cloud incumbent operating at enormous scale across Azure, Microsoft 365, GitHub, and Copilot product lines. Build is their annual developer-focused conference and one of the most-watched keynotes in the enterprise calendar.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">The Launch</td>
+      <td style="padding: 6px 0; color: #333;">At Microsoft Build 2026, CEO Satya Nadella unveiled Unmetered Agentic AI Models — a pricing and infrastructure shift allowing developers to deploy AI agents without per-token billing constraints — alongside a preview of the Majorana 2 quantum computing chip and the OpenClaw native Windows app. The core B2B value proposition is removing cost unpredictability from AI agent deployment, a key friction point for enterprise adoption at scale.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Product Fit</td>
+      <td style="padding: 6px 0; color: #333;">Unmetered Agentic AI fits squarely into Microsoft's Azure AI / Copilot platform push and directly addresses the cost anxiety that has slowed enterprise AI agent rollouts. Majorana 2 is a longer-horizon play that reinforces Azure's infrastructure credibility. Together they signal Microsoft is competing on both near-term developer economics and long-term compute differentiation — a coherent dual narrative for Build's audience.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Launch Playbook</td>
+      <td style="padding: 6px 0; color: #333;">Conference keynote slot (Build 2026, San Francisco) as the primary launch vehicle, with CNET highlight coverage amplifying the announcements. The keynote format gives Microsoft guaranteed Tier-1 media pickup and live developer audience engagement. No details in the source material about press embargoes, partner co-announcements, or community seeding tactics, which limits the score.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Messaging</td>
+      <td style="padding: 6px 0; color: #333;">The "Unmetered" framing is a deliberate pricing narrative — positioning the cost model as a feature, not just a technical spec. It directly counters developer/enterprise anxiety about unpredictable AI spend, borrowing a page from SaaS flat-rate messaging playbooks. Majorana 2 adds a forward-looking "we're building the future of compute" halo that makes the keynote feel bigger than any single product. What was left unsaid: specific pricing tiers, availability timelines, and benchmark comparisons against competing platforms.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Why This Rating</td>
+      <td style="padding: 6px 0; color: #333;">Microsoft earns inclusion because Build is a genuine Tier-1 conference keynote slot and the "Unmetered" positioning is a smart, differentiated messaging move that addresses a real enterprise pain point in plain language. The score is capped at 7 because the source material only surfaces CNET highlight coverage — deeper TechCrunch/Bloomberg/WSJ analysis that would confirm broader Tier-1 pickup isn't present in the provided articles, and Microsoft's sheer scale means even a strong launch doesn't move the needle on "strategic disruption" the way a startup's would.</td>
+    </tr>
+  </table>
+
+  <div style="margin-top: 10px;">
+    <a href="https://www.cnet.com/videos/microsoft-build-2026-keynote-highlights/" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+  </div>
+</div>
+
+---
+
+<div class="launch-item" style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #eee;">
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
+    <h3 style="margin: 0; font-size: 17px; font-weight: 600; color: #1a1a2e; flex: 1;">Ramp — AI Agent Corporate Card & Token Spend Management</h3>
+    <span style="display: inline-block; background: #0055cc; color: white; padding: 3px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-left: 12px; white-space: nowrap;">6/10</span>
+  </div>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.65;">
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600; width: 130px;">Company</td>
+      <td style="padding: 6px 0; color: #333;">Ramp is a high-growth B2B fintech offering corporate cards, expense management, procurement, and accounting automation. The company just raised $750M at a $44B valuation, cementing its status as one of the most valuable private fintech companies in the U.S.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">The Launch</td>
+      <td style="padding: 6px 0; color: #333;">Ramp launched a corporate credit card specifically designed for AI agents to use autonomously, alongside an AI token spend management product that lets businesses monitor and govern their AI API spend across providers. The value proposition: as companies deploy AI agents that make real purchases, Ramp becomes the financial control layer for the agentic enterprise.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Product Fit</td>
+      <td style="padding: 6px 0; color: #333;">This is a natural and clever extension of Ramp's core spend management platform into an emerging category — agentic AI payments — where no established incumbent exists yet. It plays directly to Ramp's strengths in card infrastructure and spend controls, while the token spend management product creates a new data moat around AI procurement that competitors can't easily replicate without Ramp's existing financial integrations.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Launch Playbook</td>
+      <td style="padding: 6px 0; color: #333;">The product launch was bundled with the $750M funding announcement, maximizing media surface area — TechCrunch covered both together, giving the product launches a Tier-1 press halo they might not have earned standalone. CEO Eric Glyman published a long-form blog post as a thought leadership play. No conference slot, partner co-announcement, or dedicated product campaign is evident from the source material.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Messaging</td>
+      <td style="padding: 6px 0; color: #333;">Ramp is positioning itself as "the financial infrastructure for the agentic enterprise" — a category-creation move that frames AI agent payments as an inevitable new spend category that CFOs need to govern. The token spend management framing is particularly sharp: it gives IT and finance buyers a concrete, immediate pain point (out-of-control AI API costs) to hang the broader narrative on. Notably, the TechCrunch reporter flagged the CEO's blog post as feeling "AI-generated," which is an ironic messaging own-goal for a company pitching AI credibility.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Why This Rating</td>
+      <td style="padding: 6px 0; color: #333;">The product concept is genuinely novel — a corporate card for AI agents is a category-creating idea with real strategic legs — and Tier-1 TechCrunch coverage gives it legitimate launch signal. The score is held to a 6 because the launch execution was piggyback rather than standalone: the products themselves were buried inside a funding announcement rather than launched with their own dedicated campaign, demo, or activation strategy. The AI-generated blog post undercuts the narrative polish you'd expect from a company at this valuation.</td>
+    </tr>
+  </table>
+
+  <div style="margin-top: 10px;">
+    <a href="https://techcrunch.com/2026/06/04/ramp-raises-750m-at-44b-valuation-as-investors-hunger-for-fintechs-with-an-ai-story/" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+  </div>
+</div>
+
+---
+
+<div class="launch-item" style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #eee;">
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
+    <h3 style="margin: 0; font-size: 17px; font-weight: 600; color: #1a1a2e; flex: 1;">DoorDash Ads — Global Commerce Media Platform</h3>
+    <span style="display: inline-block; background: #0055cc; color: white; padding: 3px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-left: 12px; white-space: nowrap;">5/10</span>
+  </div>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.65;">
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600; width: 130px;">Company</td>
+      <td style="padding: 6px 0; color: #333;">DoorDash is a large-scale consumer delivery platform operating across food, grocery, and retail verticals. DoorDash Ads is its B2B advertising business, targeting merchants and CPG brands looking to reach high-intent buyers on the platform.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">The Launch</td>
+      <td style="padding: 6px 0; color: #333;">DoorDash Ads relaunched as a "Global Commerce Media Platform," introducing a new suite spanning expanded ad formats, offsite reach capabilities, campaign automation tools, and enhanced measurement. The pitch to B2B advertisers: DoorDash's audience is uniquely high-intent ("consumers come ready to buy"), and the new platform gives brands the tools to reach them across channels with a clearer ROI view.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Product Fit</td>
+      <td style="padding: 6px 0; color: #333;">The platform expansion is a logical evolution — DoorDash has the first-party purchase data that makes retail media valuable, and the move to offsite reach mirrors exactly what Amazon Ads, Instacart Ads, and Walmart Connect have done before it. The risk is that DoorDash is a fast-follower in retail media infrastructure rather than a category creator, which limits the "disruption" narrative.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Launch Playbook</td>
+      <td style="padding: 6px 0; color: #333;">Announced via Business Wire with Financial Times market data pickup — standard press release distribution rather than an earned media or event-driven launch. No conference slot, customer co-announcement, product demo video, or community activation is evident. The launch appears to have been a PR wire push without a broader campaign architecture behind it.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Messaging</td>
+      <td style="padding: 6px 0; color: #333;">The "ready to buy" intent positioning is the strongest element
+    </div>
+
+    <div class="digest-section">
+      <div class="section-label funding">VC Funding Announcements</div>
+      <div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">IMPULSE SPACE</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Impulse Space raised a $500 million Series D led by 137 Ventures and BANNER VC, with Founders Fund among the participating investors. The company builds highly maneuverable spacecraft and is focused on in-space mobility, including its Mira platform. Proceeds will be used to hire up to 200 new employees. No new valuation was disclosed.</p>
+  <a href="https://techcrunch.com/2026/06/02/rocket-engine-startup-impulse-raises-500-million-to-hire-people-not-ai/" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">DRIVENETS</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">DriveNets, an Israeli networking startup, raised a $410 million round at an $8.5 billion valuation. Bessemer Venture Partners co-led the round alongside Atreides Management, with additional participation from Pitango, D1 Capital Partners, AMD, and Red Dot Capital Partners. No specific use of funds was disclosed in the announcement.</p>
+  <a href="https://amp.axios.com/pro-rata-premium-first-look-3a75d2c9-b85f-4bbb-8ad0-bc5e4920c494.html" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">SUPABASE</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Supabase, a San Francisco-based Postgres database management platform, raised $500 million in a Series F round at a $10.5 billion post-money valuation. GIC led the round, with Accel participating as an existing insider alongside YC, Craft Ventures, Felicis, Peak XV Partners, and Coatue. No specific use of funds was disclosed in the announcement.</p>
+  <a href="https://www.axios.com/pro/all-deals/2026/06/04/pro-rata-premium-first-look" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">NSAVE</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">nsave, a Swiss-based offshore banking platform, raised $18 million in a Series A round with participation from Sequoia Capital and Y Combinator. The company provides international accounts, global transfers, and savings products to underbanked populations who lack access to stable foreign currency banking. Funds will be used to expand its financial services platform. No new valuation was disclosed.</p>
+  <a href="https://www.thesaasnews.com/news/nsave-raises-18m-series-a/" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+    </div>
+
+  </div>
+
+  <script>
+    const CONTEXT_PROMPT = `This is the archived Weekly Launch Digest for the week ending June 05, 2026.`;
+
+    async function openInClaude() {
+      const btn = document.getElementById('claude-btn');
+      const label = document.getElementById('btn-label');
+      const hint = document.getElementById('copy-hint');
+
+      try {
+        await navigator.clipboard.writeText(CONTEXT_PROMPT);
+        btn.classList.add('copied');
+        label.textContent = 'Copied!';
+        hint.classList.add('visible');
+      } catch (e) {
+        // Clipboard blocked (e.g. non-HTTPS) — open Claude anyway
+      }
+
+      window.open('https://claude.ai', '_blank');
+
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        label.textContent = 'Discuss in Claude.ai';
+        hint.classList.remove('visible');
+      }, 4000);
+    }
+  </script>
+
+</body>
+</html>

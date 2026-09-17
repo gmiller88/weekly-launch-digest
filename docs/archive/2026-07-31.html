@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weekly Launch Digest — July 31, 2026</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      min-height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: #f0f2f5;
+      color: #1a1a2e;
+    }
+
+    #page { max-width: 740px; margin: 0 auto; padding: 0 16px 48px; }
+
+    /* Header */
+    #digest-header {
+      background: #1a1a2e;
+      margin: 0 -16px;
+      padding: 24px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    #digest-header h1 {
+      font-size: 19px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.3px;
+    }
+
+    #digest-header .date { font-size: 12px; color: #8888aa; margin-top: 3px; }
+
+    #digest-header .archive-link {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #8899cc;
+      text-decoration: none;
+    }
+
+    #digest-header .archive-link:hover { color: #aabbee; }
+
+    /* Open in Claude button */
+    #claude-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #0055cc;
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      padding: 9px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+      flex-shrink: 0;
+    }
+
+    #claude-btn:hover { background: #0044aa; }
+    #claude-btn.copied { background: #007744; cursor: default; }
+    #claude-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    #copy-hint {
+      font-size: 11px;
+      color: #8888aa;
+      margin-top: 6px;
+      text-align: right;
+      display: none;
+    }
+
+    #copy-hint.visible { display: block; }
+
+    /* Sections */
+    .digest-section {
+      background: white;
+      border-radius: 8px;
+      padding: 24px 28px;
+      margin-top: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-label::before {
+      content: "";
+      display: inline-block;
+      width: 3px;
+      height: 14px;
+      border-radius: 2px;
+    }
+
+    .section-label.funding { color: #0055cc; }
+    .section-label.funding::before { background: #0055cc; }
+    .section-label.launches { color: #007744; }
+    .section-label.launches::before { background: #007744; }
+
+    /* ── Digest content (targets from digest/render.py) ───────────── */
+
+    .d-item {
+      margin-bottom: 32px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .d-item:last-child, .d-fund-item:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .d-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .d-title {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 600;
+      color: #1a1a2e;
+      flex: 1;
+      line-height: 1.4;
+    }
+
+    .d-score, .d-score-na {
+      display: inline-block;
+      color: white;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 700;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .d-score { background: #0055cc; font-size: 13px; }
+    .d-score-na { background: #777; font-size: 12px; }
+
+    .d-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .d-th {
+      padding: 6px 12px 6px 0;
+      vertical-align: top;
+      white-space: nowrap;
+      color: #555;
+      font-weight: 600;
+      width: 130px;
+      text-align: left;
+    }
+
+    .d-td { padding: 6px 0; color: #333; }
+    .d-table tr:nth-child(even) { background: #fafafa; }
+
+    .d-steal {
+      margin-top: 14px;
+      padding: 12px 14px;
+      background: #f2f7f4;
+      border-left: 3px solid #007744;
+      border-radius: 4px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #234;
+    }
+
+    .d-steal-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.1px;
+      text-transform: uppercase;
+      color: #007744;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .d-evidence {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #888;
+      line-height: 1.55;
+    }
+
+    .d-note {
+      font-style: italic;
+      color: #555;
+      margin-bottom: 20px;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .d-pattern {
+      margin-bottom: 24px;
+      padding: 14px 16px;
+      background: #f7f7fb;
+      border-left: 3px solid #0055cc;
+      border-radius: 4px;
+      font-size: 14px;
+      line-height: 1.7;
+      color: #333;
+    }
+
+    .d-pattern-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.1px;
+      text-transform: uppercase;
+      color: #0055cc;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .d-links { margin-top: 10px; font-size: 13px; }
+    .d-link { color: #0055cc; text-decoration: none; }
+    .d-link:hover { text-decoration: underline; }
+    .d-empty { color: #666; font-size: 14px; }
+
+    .d-fund-item {
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .d-fund-title {
+      margin: 0 0 8px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #1a1a2e;
+    }
+
+    .d-fund-body {
+      margin: 0 0 10px;
+      line-height: 1.65;
+      color: #333;
+      font-size: 14px;
+    }
+
+    /* Archive index */
+    .archive-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .archive-row:last-child { border-bottom: none; }
+    .archive-row a { color: #0055cc; text-decoration: none; font-weight: 600; font-size: 15px; }
+    .archive-row a:hover { text-decoration: underline; }
+    .archive-row .meta { font-size: 12px; color: #888; }
+
+    @media (max-width: 560px) {
+      .d-table, .d-table tbody, .d-table tr, .d-th, .d-td { display: block; width: auto; }
+      .d-th { padding-bottom: 0; }
+      .d-td { padding-top: 2px; padding-bottom: 10px; }
+      .d-table tr:nth-child(even) { background: transparent; }
+    }
+  </style>
+</head>
+<body>
+  <div id="page">
+
+    <div id="digest-header">
+      <div>
+        <h1>Weekly Launch Digest</h1>
+        <div class="date">Week ending July 31, 2026</div>
+        <a class="archive-link" href="../archive.html">Browse past weeks &rarr;</a>
+      </div>
+      <div>
+        <button id="claude-btn" onclick="openInClaude()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <span id="btn-label">Discuss in Claude.ai</span>
+        </button>
+        <div id="copy-hint">Digest copied &mdash; just paste into Claude.ai</div>
+      </div>
+    </div>
+
+    <div class="digest-section">
+      <div class="section-label launches">Top B2B Product Launches</div>
+      <p style="font-style: italic; color: #555; margin-bottom: 24px; font-size: 14px;"><strong>Analyst Note:</strong> This was a notably thin week for B2B software launches by PMM execution standards — the article set is heavy on press-release filler, funding announcements, and consumer hardware speculation, with very few true product launches backed by intentional go-to-market campaigns. The clearest theme is the ABM/AI automation space continuing to consolidate around the "signal-to-action gap" narrative, but even the strongest entries this week would be mid-table in a busier news cycle. Only two launches cleared the bar with confidence; a third is included with caveats.</p>
+
+<div class="launch-item" style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #eee;">
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
+    <h3 style="margin: 0; font-size: 17px; font-weight: 600; color: #1a1a2e; flex: 1;">6sense — AI-Recommended Leads</h3>
+    <span style="display: inline-block; background: #0055cc; color: white; padding: 3px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-left: 12px; white-space: nowrap;">6/10</span>
+  </div>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.65;">
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600; width: 130px;">Company</td>
+      <td style="padding: 6px 0; color: #333;">6sense is a leading Account-Based Marketing (ABM) and revenue intelligence platform used by mid-market and enterprise B2B sales and marketing teams. The company is late-stage/pre-IPO scale and competes directly with Demandbase, Bombora, and HubSpot's intent layer.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">The Launch</td>
+      <td style="padding: 6px 0; color: #333;">AI-Recommended Leads automates the delivery of CRM-ready contact records to sales reps, surfacing the right people at the right accounts based on live intent signals — collapsing what was previously a manual, multi-step process of reviewing account signals and sourcing contacts into a single automated handoff.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Product Fit</td>
+      <td style="padding: 6px 0; color: #333;">This is a natural and well-timed extension of 6sense's core competency — intent data and account scoring. By closing the last mile into CRM lead delivery, they're reducing friction at the exact hand-off point where their platform's value most often gets lost. It plays directly to their strengths and doesn't feel like a stretch.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Launch Playbook</td>
+      <td style="padding: 6px 0; color: #333;">The launch was bundled with Demandbase's simultaneous DemandWorks announcement, which created an industry news moment rather than a standalone splash. Coverage came via trade media (MarketScale) framing both as a category-level trend. No evidence of a dedicated press embargo, conference slot, influencer seeding, or customer co-announcement — the launch relied almost entirely on industry press pickup.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Messaging</td>
+      <td style="padding: 6px 0; color: #333;">The narrative centers on "closing the last mile" between marketing signals and sales action — a crisp, relatable pain point for any revenue team. They emphasized speed ("quicker CRM-ready contact delivery") and conversion impact. Notably, they leaned into the "automation of the handoff" framing rather than leading with AI as a buzzword, which is a smarter choice in a market fatigued by empty AI claims.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Why This Rating</td>
+      <td style="padding: 6px 0; color: #333;">The product concept is strong and the messaging angle is clean, but the launch execution was passive — no owned moment, no marquee customer proof point, and the news cycle was shared with a competitor rather than owned. A 6 reflects a competent product extension with workmanlike distribution; a dedicated launch campaign with a customer case study and a Tier-1 press placement could have pushed this to an 8.</td>
+    </tr>
+  </table>
+
+  <div style="margin-top: 10px;">
+    <a href="https://www.marketscale.com/industries/marketing-tech/account-intelligence-platforms-are-closing-the-last-mile-between-ad-engagement-and-sales-action" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+  </div>
+</div>
+
+<div class="launch-item" style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #eee;">
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
+    <h3 style="margin: 0; font-size: 17px; font-weight: 600; color: #1a1a2e; flex: 1;">LinkedIn — Creator Marketplace & BrandWorks</h3>
+    <span style="display: inline-block; background: #0055cc; color: white; padding: 3px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-left: 12px; white-space: nowrap;">6/10</span>
+  </div>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.65;">
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600; width: 130px;">Company</td>
+      <td style="padding: 6px 0; color: #333;">LinkedIn is Microsoft's professional network and the dominant B2B advertising and talent platform globally, with over 1 billion members. While it qualifies as an enterprise incumbent, this launch represents a genuine new category entry for the platform — B2B influencer marketing infrastructure — which clears the bar for inclusion.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">The Launch</td>
+      <td style="padding: 6px 0; color: #333;">Creator Marketplace is a matchmaking layer connecting B2B brands with LinkedIn creators for sponsored content partnerships, while BrandWorks is a managed creative service that handles ideation, production, and distribution of branded content — effectively LinkedIn becoming an in-house creator agency for B2B marketers.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Product Fit</td>
+      <td style="padding: 6px 0; color: #333;">This is a logical but ambitious extension of LinkedIn's ad business — they own the audience, the professional context, and increasingly the creator supply side, so building a marketplace to monetize that intersection makes strategic sense. The risk is brand dilution and the complexity of managing creator quality at scale, which is a meaningful operational stretch for a platform historically focused on self-serve and programmatic ad tools.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Launch Playbook</td>
+      <td style="padding: 6px 0; color: #333;">Announced June 10, 2026 — outside this week's window but still circulating in B2B marketing coverage, which reflects genuine durability of interest. Coverage was picked up by B2B-focused outlets. No evidence of a major conference anchor or viral social moment in the articles provided; distribution appears to have been primarily via LinkedIn's own channels and trade press, which is a somewhat self-referential strategy for a platform launch.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Messaging</td>
+      <td style="padding: 6px 0; color: #333;">LinkedIn positioned this squarely around the unsolved problem of B2B influencer marketing — the lack of a structured, trusted channel for brand-creator collaboration in a professional context. The "in-house creative and influencer marketing service tailored for B2B brands" framing is differentiated and avoids the trap of just calling it "LinkedIn's version of TikTok's creator marketplace." They wisely emphasized B2B specificity as the moat.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Why This Rating</td>
+      <td style="padding: 6px 0; color: #333;">The strategic logic is sound and the category framing is smart, but the launch predates this week's window and the execution evidence in the provided articles is thin — no marquee brand co-announcements, no creator cohort revealed, no pricing or access details that would drive urgency. LinkedIn's own distribution advantages should have generated more visible buzz than what's evident here, suggesting the rollout was soft rather than a hard launch moment.</td>
+    </tr>
+  </table>
+
+  <div style="margin-top: 10px;">
+    <a href="https://quasa.io/media/big-day-for-b2b-linkedin-launches-creator-marketplace-and-brandworks" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+  </div>
+</div>
+
+<div class="launch-item" style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #eee;">
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
+    <h3 style="margin: 0; font-size: 17px; font-weight: 600; color: #1a1a2e; flex: 1;">Solitics — Saai (Agentic AI for Retail Banking)</h3>
+    <span style="display: inline-block; background: #0055cc; color: white; padding: 3px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-left: 12px; white-space: nowrap;">4/10</span>
+  </div>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.65;">
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600; width: 130px;">Company</td>
+      <td style="padding: 6px 0; color: #333;">Solitics is an Israel-based SaaS company specializing in adaptive customer engagement and marketing automation, with a growing vertical focus on regulated industries including retail banking. The company appears to be growth-stage, with customers across financial services and gaming verticals.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">The Launch</td>
+      <td style="padding: 6px 0; color: #333;">Saai is a suite of agentic AI tools embedded into Solitics' marketing automation platform, purpose-built for retail banking marketing and product teams. It promises to reduce manual CRM campaign work, accelerate campaign execution timelines, and surface deeper customer insights — with a 45-day integration guarantee as the headline commitment.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Product Fit</td>
+      <td style="padding: 6px 0; color: #333;">The vertical focus on retail banking is a smart sharpening of Solitics' existing engagement automation capabilities — financial services is a compliance-heavy environment where a purpose-built, integrated tool has a real moat over horizontal automation players. The agentic framing fits the current market moment. However, the product description remains quite generic, and it's unclear what is genuinely net-new versus rebadged automation features.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Launch Playbook</td>
+      <td style="padding: 6px 0; color: #333;">Coverage was limited to TechBullion, a mid-tier tech PR wire outlet, via a TechnologyWire press release — a strong signal that this was a press-release-driven launch with no earned media strategy. No conference slot, no customer co-announcement, no Product Hunt presence, and no evidence of social amplification detected in the provided articles. Distribution was essentially self-published.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Messaging</td>
+      <td style="padding: 6px 0; color: #333;">The "agentic AI built specifically for marketing and product teams in retail banking" angle is the right instinct — vertical specificity is a credible differentiator. The 45-day integration guarantee is a concrete, buyer-friendly commitment worth leading with more prominently. However, the overall messaging leans heavily on category buzzwords ("next-generation," "dramatically reduce manual work") without the proof points or customer voice needed to make them land.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Why This Rating</td>
+      <td style="padding: 6px 0; color: #333;">Saai is included as the third entry primarily because
+    </div>
+
+    <div class="digest-section">
+      <div class="section-label funding">VC Funding Announcements</div>
+      <div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Atoms</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Atoms, the physical AI startup founded by Uber co-founder Travis Kalanick, raised $1.7 billion in a round led by Andreessen Horowitz. No valuation was disclosed in the available summary. The round is the largest venture financing reported this week.</p>
+  <a href="https://news.crunchbase.com/venture/biggest-funding-rounds-physical-ai-fintech-defense-atoms" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Genius AI</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Genius AI, a platform for automating scheduling, payments, marketing, and client management for in-person service businesses, raised $44 million in a Series D round led by Lux Capital, with Bessemer Venture Partners among the participating investors. The round brings the company's total capital raised to more than $125 million. Founded in 2016 by Danielle Cohen-Shohet and Leah Cohen-Shohet, the company did not specify a use of funds beyond continued growth.</p>
+  <a href="https://www.alleywatch.com/2026/07/the-alleywatch-startup-daily-funding-report-7-27-2026-2" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Harvey</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Legal AI company Harvey announced new investments from funds affiliated with JP Morgan and Goldman Sachs. These follow a $200 million round Harvey closed in March, which was led by GIC and Sequoia Capital. The company stated the funding will support global growth and help customers build specialized AI models. Harvey also completed two acquisitions earlier in 2026, including product demo startup Hexus in January.</p>
+  <a href="https://www.law.com/legaltechnews/2026/07/28/harvey-announces-investments-from-jp-morgan-goldman-sachs-funds" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Ellis AI</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Ellis AI, a startup using AI agents to automate workflows for private credit managers, raised $10 million in seed funding. Investors include Khosla Ventures and Thrive Capital, alongside First Round Capital, 645 Ventures, Harlem Capital, Slow Capital, and Ariel Alternatives CEO Mellody Hobson. The company was founded by Ryan Williams, who previously co-founded real estate investment platform Cadre. Ellis emerged from stealth alongside the funding announcement.</p>
+  <a href="https://techcrunch.com/2026/07/31/repeat-founder-ryan-williams-raises-10m-seed-for-an-ai-startup-for-private-credit-managers" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Onyx Security</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Cybersecurity startup Onyx Security raised $113 million in a Series B round led by Bessemer Venture Partners, valuing the company at approximately $640 million. The round came just four months after the company emerged from stealth, having previously raised a $5 million seed and a $35 million Series A. No specific use of funds was detailed in the available summary.</p>
+  <a href="https://www.calcalistech.com/ctechnews/article/b1fsjydszg" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">DataBahn</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">DataBahn, a Dallas-based company building an agentic data control plane for enterprises, raised $40 million in a Series B round led by Insight Partners, with participation from existing investors Forgepoint, GTM Capital, and S3 Ventures. The round brings total funding to $59 million. The company stated the capital will be used to accelerate product development as enterprises increasingly rely on AI agents that require trusted, contextualized data.</p>
+  <a href="https://www.prnewswire.com/news-releases/databahn-raises-40-million-series-b-led-by-insight-partners-to-accelerate-innovation-across-the-agentic-data-control-plane-302838690.html" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Paper</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Paper, an Irvine-based digital canvas tool for designers, has raised a total of $34 million in equity funding, with Accel listed among its backers. The company was founded by Stephen Haney in 2024. No round stage or specific new raise amount was disclosed in the available summary.</p>
+  <a href="https://www.alleywatch.com/2026/07/the-weekly-notable-startup-funding-report-7-27-26" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Etched</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Etched, a San Jose-based AI chip company that builds hardware specifically for transformer architecture inference, raised $300 million in a Series C round led by Sequoia Capital, with Andreessen Horowitz and SK Hynix also participating. The round doubled the company's valuation from $5 billion to $10.3 billion in roughly seven months. No specific use of funds was stated beyond continued development of its transformer-focused chip architecture.</p>
+  <a href="https://www.startuphub.ai/ai-news/ai-news/2026/stripe-openrouter-atoms-infrastructure-week-july-2026" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Together AI</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Together AI, a San Francisco-based open-source AI infrastructure platform, raised $800 million in a Series C round. General Catalyst participated in the round alongside Aramco Ventures, Vista Equity, Nvidia, and Salesforce Ventures. No valuation or specific use of funds was disclosed in the available summary.</p>
+  <a href="https://r136ventures.substack.com/p/r136-ventures-growth-digest-14-the" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Chai Discovery</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Chai Discovery, a San Francisco-based AI-powered drug discovery company, raised $400 million in a Series C round. Index Ventures, Kleiner Perkins, and Sequoia Capital all participated in the financing. No valuation or specific use of funds was disclosed in the available summary.</p>
+  <a href="https://r136ventures.substack.com/p/r136-ventures-growth-digest-14-the" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+    </div>
+
+  </div>
+
+  <script>
+    const CONTEXT_PROMPT = `This is the archived Weekly Launch Digest for the week ending July 31, 2026.`;
+
+    async function openInClaude() {
+      const btn = document.getElementById('claude-btn');
+      const label = document.getElementById('btn-label');
+      const hint = document.getElementById('copy-hint');
+
+      try {
+        await navigator.clipboard.writeText(CONTEXT_PROMPT);
+        btn.classList.add('copied');
+        label.textContent = 'Copied!';
+        hint.classList.add('visible');
+      } catch (e) {
+        // Clipboard blocked (e.g. non-HTTPS) — open Claude anyway
+      }
+
+      window.open('https://claude.ai', '_blank');
+
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        label.textContent = 'Discuss in Claude.ai';
+        hint.classList.remove('visible');
+      }, 4000);
+    }
+  </script>
+
+</body>
+</html>

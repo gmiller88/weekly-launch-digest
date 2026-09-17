@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weekly Launch Digest — September 11, 2026</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      min-height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: #f0f2f5;
+      color: #1a1a2e;
+    }
+
+    #page { max-width: 740px; margin: 0 auto; padding: 0 16px 48px; }
+
+    /* Header */
+    #digest-header {
+      background: #1a1a2e;
+      margin: 0 -16px;
+      padding: 24px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    #digest-header h1 {
+      font-size: 19px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.3px;
+    }
+
+    #digest-header .date { font-size: 12px; color: #8888aa; margin-top: 3px; }
+
+    #digest-header .archive-link {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #8899cc;
+      text-decoration: none;
+    }
+
+    #digest-header .archive-link:hover { color: #aabbee; }
+
+    /* Open in Claude button */
+    #claude-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #0055cc;
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      padding: 9px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+      flex-shrink: 0;
+    }
+
+    #claude-btn:hover { background: #0044aa; }
+    #claude-btn.copied { background: #007744; cursor: default; }
+    #claude-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    #copy-hint {
+      font-size: 11px;
+      color: #8888aa;
+      margin-top: 6px;
+      text-align: right;
+      display: none;
+    }
+
+    #copy-hint.visible { display: block; }
+
+    /* Sections */
+    .digest-section {
+      background: white;
+      border-radius: 8px;
+      padding: 24px 28px;
+      margin-top: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-label::before {
+      content: "";
+      display: inline-block;
+      width: 3px;
+      height: 14px;
+      border-radius: 2px;
+    }
+
+    .section-label.funding { color: #0055cc; }
+    .section-label.funding::before { background: #0055cc; }
+    .section-label.launches { color: #007744; }
+    .section-label.launches::before { background: #007744; }
+
+    /* ── Digest content (targets from digest/render.py) ───────────── */
+
+    .d-item {
+      margin-bottom: 32px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .d-item:last-child, .d-fund-item:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .d-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .d-title {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 600;
+      color: #1a1a2e;
+      flex: 1;
+      line-height: 1.4;
+    }
+
+    .d-score, .d-score-na {
+      display: inline-block;
+      color: white;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 700;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .d-score { background: #0055cc; font-size: 13px; }
+    .d-score-na { background: #777; font-size: 12px; }
+
+    .d-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .d-th {
+      padding: 6px 12px 6px 0;
+      vertical-align: top;
+      white-space: nowrap;
+      color: #555;
+      font-weight: 600;
+      width: 130px;
+      text-align: left;
+    }
+
+    .d-td { padding: 6px 0; color: #333; }
+    .d-table tr:nth-child(even) { background: #fafafa; }
+
+    .d-steal {
+      margin-top: 14px;
+      padding: 12px 14px;
+      background: #f2f7f4;
+      border-left: 3px solid #007744;
+      border-radius: 4px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #234;
+    }
+
+    .d-steal-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.1px;
+      text-transform: uppercase;
+      color: #007744;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .d-evidence {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #888;
+      line-height: 1.55;
+    }
+
+    .d-note {
+      font-style: italic;
+      color: #555;
+      margin-bottom: 20px;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .d-pattern {
+      margin-bottom: 24px;
+      padding: 14px 16px;
+      background: #f7f7fb;
+      border-left: 3px solid #0055cc;
+      border-radius: 4px;
+      font-size: 14px;
+      line-height: 1.7;
+      color: #333;
+    }
+
+    .d-pattern-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.1px;
+      text-transform: uppercase;
+      color: #0055cc;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .d-links { margin-top: 10px; font-size: 13px; }
+    .d-link { color: #0055cc; text-decoration: none; }
+    .d-link:hover { text-decoration: underline; }
+    .d-empty { color: #666; font-size: 14px; }
+
+    .d-fund-item {
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .d-fund-title {
+      margin: 0 0 8px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #1a1a2e;
+    }
+
+    .d-fund-body {
+      margin: 0 0 10px;
+      line-height: 1.65;
+      color: #333;
+      font-size: 14px;
+    }
+
+    /* Archive index */
+    .archive-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .archive-row:last-child { border-bottom: none; }
+    .archive-row a { color: #0055cc; text-decoration: none; font-weight: 600; font-size: 15px; }
+    .archive-row a:hover { text-decoration: underline; }
+    .archive-row .meta { font-size: 12px; color: #888; }
+
+    @media (max-width: 560px) {
+      .d-table, .d-table tbody, .d-table tr, .d-th, .d-td { display: block; width: auto; }
+      .d-th { padding-bottom: 0; }
+      .d-td { padding-top: 2px; padding-bottom: 10px; }
+      .d-table tr:nth-child(even) { background: transparent; }
+    }
+  </style>
+</head>
+<body>
+  <div id="page">
+
+    <div id="digest-header">
+      <div>
+        <h1>Weekly Launch Digest</h1>
+        <div class="date">Week ending September 11, 2026</div>
+        <a class="archive-link" href="../archive.html">Browse past weeks &rarr;</a>
+      </div>
+      <div>
+        <button id="claude-btn" onclick="openInClaude()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <span id="btn-label">Discuss in Claude.ai</span>
+        </button>
+        <div id="copy-hint">Digest copied &mdash; just paste into Claude.ai</div>
+      </div>
+    </div>
+
+    <div class="digest-section">
+      <div class="section-label launches">Top B2B Product Launches</div>
+      <p style="font-style: italic; color: #555; margin-bottom: 24px; font-size: 14px;"><strong>Analyst Note:</strong> This was a week firmly dominated by the agentic AI theme — nearly every notable B2B launch framed itself around autonomous AI agents operating across finance, security, customer experience, or enterprise data. The overall execution quality was mixed: a few launches showed genuine strategic clarity and funding muscle, but the majority of articles in this batch were roundups, awards, and acquisition news rather than discrete product launches with dedicated campaign infrastructure. Only three entries cleared the bar for meaningful PMM execution worth analyzing.</p>
+
+<div class="launch-item" style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #eee;">
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
+    <h3 style="margin: 0; font-size: 17px; font-weight: 600; color: #1a1a2e; flex: 1;">Cymphony — Stealth-to-Launch with $30M to Secure AI Agent Access to Enterprise Data</h3>
+    <span style="display: inline-block; background: #0055cc; color: white; padding: 3px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-left: 12px; white-space: nowrap;">8/10</span>
+  </div>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.65;">
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600; width: 130px;">Company</td>
+      <td style="padding: 6px 0; color: #333;">Cymphony is an early-stage enterprise security startup emerging from stealth, focused on giving enterprises visibility and control over how AI agents access and interact with sensitive organizational data. Backed by Sequoia Capital and SMBC Fin Atlas Beyond Fund, they are launching directly into the agentic AI security category.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">The Launch</td>
+      <td style="padding: 6px 0; color: #333;">A full company launch out of stealth, paired with a $30M funding announcement. The core product provides an end-to-end platform for securing, monitoring, and governing AI agent access to enterprise data — addressing the insider risk and data exposure problem that emerges when agentic AI systems operate across corporate environments.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Product Fit</td>
+      <td style="padding: 6px 0; color: #333;">As a stealth launch, this is the foundational product — there's no prior suite to extend. The fit is entirely about timing: they're entering the market exactly as enterprises are grappling with uncontrolled AI agent proliferation, and the Anthropic threat intelligence report published the same week (documenting AI-assisted SaaS breaches at scale) served as inadvertent third-party validation of the exact problem Cymphony is solving.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Launch Playbook</td>
+      <td style="padding: 6px 0; color: #333;">Classic stealth-to-launch playbook: anchor the announcement to a significant funding round to command credibility, use Sequoia's brand as a credibility multiplier, and issue via Newswire with investor quote pull-through. The Sequoia partner quote ("companies that provide visibility and control over that new workforce have the opportunity to become foundational platforms") was clearly crafted for earned media pick-up and LinkedIn amplification. No evidence of a conference slot or product demo, but the funding news drives its own distribution cycle.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Messaging</td>
+      <td style="padding: 6px 0; color: #333;">Sharp category-creation framing: they're not pitching "security software" — they're explicitly redefining insider risk for the agentic era ("insider risk is being redefined in enterprises"). The "new workforce" metaphor for AI agents is deliberate and sticky, positioning the problem as organizational governance rather than technical threat detection. They wisely avoided overloading the launch announcement with product specifics, keeping the narrative at the strategic/categorical level where it generates the most executive-level interest.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Why This Rating</td>
+      <td style="padding: 6px 0; color: #333;">This earns an 8 because the timing, framing, and backer caliber converge cleanly — Sequoia's imprimatur plus a category-creation narrative in a problem space that is visibly and urgently real gives this launch above-average staying power. The score doesn't reach 9 or 10 because the distribution relied primarily on the funding wire rather than a multi-channel campaign, and there were no marquee enterprise customer co-announcements to demonstrate demand-side validation beyond investor conviction.</td>
+    </tr>
+  </table>
+
+  <div style="margin-top: 10px;">
+    <a href="https://www.newswire.com/news/cymphony-launches-with-30-million-to-secure-ai-agents-access-to-22857048" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+  </div>
+</div>
+
+<div class="launch-item" style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #eee;">
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
+    <h3 style="margin: 0; font-size: 17px; font-weight: 600; color: #1a1a2e; flex: 1;">Articulate — Nova, Frontline, and Enterprise Integration Suite</h3>
+    <span style="display: inline-block; background: #0055cc; color: white; padding: 3px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-left: 12px; white-space: nowrap;">7/10</span>
+  </div>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.65;">
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600; width: 130px;">Company</td>
+      <td style="padding: 6px 0; color: #333;">Articulate is the dominant workplace learning and training platform, trusted by 100% of the Fortune 100 and over 125,000 organizations globally. They are a growth-stage SaaS company with clear market leadership in the L&D software category.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">The Launch</td>
+      <td style="padding: 6px 0; color: #333;">Articulate announced a multi-pronged platform evolution: Nova (an AI-powered authoring and content capability), Frontline (a dedicated product line targeting frontline and deskless workers — a historically underserved segment in L&D), and a new suite of enterprise integrations. Together these represent a meaningful expansion of their addressable market and platform depth simultaneously.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Product Fit</td>
+      <td style="padding: 6px 0; color: #333;">Both extensions play to Articulate's core strengths while pushing into new territory strategically. Nova deepens their AI authoring moat in a segment where they already lead. Frontline is the bolder bet — it opens a new buyer persona (operations and field workforce managers vs. traditional L&D teams) and a new deployment context, which is a calculated market expansion rather than a defensive move. Enterprise integrations reinforce their platform-not-point-solution positioning at the top of the market.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Launch Playbook</td>
+      <td style="padding: 6px 0; color: #333;">Issued via Business Wire with a branded "platform evolution" framing — signaling that this is a strategic moment, not a feature drop. The simultaneous announcement of three distinct capabilities (Nova, Frontline, integrations) suggests a coordinated campaign with internal alignment across product, marketing, and sales rather than a staggered changelog release. No conference keynote slot is evident from coverage, but the Business Wire distribution and "most significant" superlative framing indicate a deliberate press embargo and media strategy.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Messaging</td>
+      <td style="padding: 6px 0; color: #333;">The "major platform evolution" framing is doing heavy lifting — it positions this as an inflection point for the company rather than incremental feature work. Highlighting Fortune 100 penetration (100% of the Fortune 100) as the credibility anchor at the top is effective social proof for enterprise buyers evaluating platform risk. The Frontline announcement notably opens a new narrative angle around workforce inclusivity in training, which has both market and PR resonance. What's left unsaid: specific pricing, AI model details, or concrete enterprise customer proof points for the new Frontline product.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Why This Rating</td>
+      <td style="padding: 6px 0; color: #333;">A 7 reflects genuinely solid execution of a complex multi-product launch — doing three things at once without muddling the core message is harder than it looks, and Articulate managed it. The score is tempered by the absence of visible tier-1 media coverage in the provided articles, no conference anchor, and limited visibility into whether Frontline had customer proof points at launch — which would have meaningfully elevated both the credibility and the media pull of this announcement.</td>
+    </tr>
+  </table>
+
+  <div style="margin-top: 10px;">
+    <a href="https://www.businesswire.com/news/home/20260908196909/en/Articulate-Unveils-Major-Platform-Evolution-With-Nova-Frontline-and-New-Enterprise-Integrations" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+  </div>
+</div>
+
+<div class="launch-item" style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #eee;">
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
+    <h3 style="margin: 0; font-size: 17px; font-weight: 600; color: #1a1a2e; flex: 1;">Parafin × Tekion — Pay Over Time B2B BNPL for Automotive Dealerships</h3>
+    <span style="display: inline-block; background: #0055cc; color: white; padding: 3px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-left: 12px; white-space: nowrap;">6/10</span>
+  </div>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.65;">
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600; width: 130px;">Company</td>
+      <td style="padding: 6px 0; color: #333;">Parafin is a growth-stage embedded finance company that builds capital and payment products for platforms, enabling those platforms to offer financial services to their business customers. Tekion is an AI-native automotive retail platform serving dealerships end-to-end, with significant market penetration across the automotive retail ecosystem.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">The Launch</td>
+      <td style="padding: 6px 0; color: #333;">Parafin and Tekion jointly launched "Pay Over Time," a B2B buy-now-pay-later product embedded directly into Tekion's Automotive Retail Cloud (ARC) platform. It allows dealership business customers to split invoices into biweekly installments with seconds-level approval at checkout — bringing BNPL mechanics that are common in consumer and SMB contexts into the automotive B2B supply chain.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Product Fit</td>
+      <td style="padding: 6px 0; color: #333;">For Parafin, this is a natural extension of their embedded finance model — they provide the financial infrastructure, the platform (Tekion) provides the distribution, which is exactly their stated go-to-market strategy. For Tekion, adding B2B payment flexibility deepens platform stickiness and creates a new revenue layer without requiring dealerships to go outside their primary workflow. The vertical specificity (automotive retail only) is a strength for precision targeting but limits immediate scale narrative.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Launch Playbook</td>
+      <td style="padding: 6px 0; color: #333;">Dual-company co-announcement via Business Wire, picked up by Yahoo Finance — a competent but conventional playbook. The joint press release format is appropriate for a partnership launch and gives both companies earned media credit. The "seconds-level approval" and "embedded at checkout" specifics are smart inclusion for technical buyers. No evidence of a dedicated campaign landing page, influencer seeding in automotive or fintech communities, or a conference tie-in that would have amplified reach.</td>
+    </tr>
+    <tr>
+      <td style="
+    </div>
+
+    <div class="digest-section">
+      <div class="section-label funding">VC Funding Announcements</div>
+      <div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Cognition</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Cognition raised a $2 billion Series E round, valuing the AI coding startup at $48 billion. The round was led by new investors Andreessen Horowitz and Accel, with existing investors Founders Fund, General Catalyst, and Benchmark also participating, alongside Bessemer Venture Partners, Kleiner Perkins, Greylock, and Lightspeed. The company's annualized revenue run rate has grown from $492 million in May to nearly $900 million. Cognition did not specify a stated use of funds in the announcement.</p>
+  <a href="https://americanbazaaronline.com/2026/09/09/cognition-raises-2b-as-ai-coding-startup-hits-48-billion-valuation-487823" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Harvey</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Harvey raised a $550 million round, bringing its valuation to $15.5 billion. The round was led by Diffusion and Lightspeed Venture Partners, with existing investors Sequoia, Kleiner Perkins, and Andreessen Horowitz among the participants. Harvey develops AI tools for law firms and corporate legal teams, covering contract analysis, due diligence, compliance, and litigation workflows. The company plans to use the capital to expand hiring and develop its platform to help legal teams build and manage their own AI-driven intelligence systems.</p>
+  <a href="https://www.harvey.ai/blog/harvey-raises-dollar550m-at-a-dollar155b-valuation-to-help-legal-teams-own-their-intelligence" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Gimlet Labs</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Gimlet Labs raised a $300 million round, bringing its total equity funding to $392 million. Andreessen Horowitz is among the company's confirmed backers. The San Francisco-based startup, founded in 2023, builds infrastructure and applied research solutions for running agent-based AI workloads. The announcement did not specify a new valuation or detailed use of funds beyond general growth.</p>
+  <a href="https://alleywatch.com/2026/09/the-weekly-notable-startup-funding-report-9-8-26" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Clay</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Clay raised a $115 million round led by Wellington Management, with Sequoia Capital and A16Z Perennial — an affiliate of Andreessen Horowitz — among the participants. The AI-powered sales tools company did not disclose a new valuation. The round also included DST Global and CapitalG, an investment arm of Alphabet. The company is positioned as a late-stage growth candidate, with the involvement of Wellington suggesting a pre-IPO trajectory.</p>
+  <a href="https://www.nytimes.com/2026/09/09/business/dealbook/clay-ai-fundraising.html" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Lightfield</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Lightfield raised a $47 million Series A led by Andreessen Horowitz (a16z). The company is building an AI-native customer relationship management platform intended to replace traditional CRM systems like Salesforce and HubSpot, while also offering a two-way sync option for teams that want to run both in parallel. No new valuation was disclosed. The company plans to use the funds to accelerate growth and expand its platform.</p>
+  <a href="https://www.unite.ai/lightfield-raises-47m-series-a-led-by-a16z-to-accelerate-growth" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Atorie</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Atorie raised a $9.5 million seed round from investors including a16z speedrun, Night Capital, and Jeremy Liew of Lightspeed Venture Partners. The Los Angeles-based startup uses AI to connect consumers directly with luxury manufacturers, cutting out traditional designer intermediaries to offer high-quality goods at lower prices. No valuation was disclosed. The company plans to use the funding to build out its platform and expand its consumer base.</p>
+  <a href="https://dot.la/alex-heath-joins-sound-ventures-2677848014.html" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Flagler Health</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Flagler Health raised a $50 million Series B, bringing its total equity funding to $58.5 million. Bessemer Venture Partners participated in the round alongside Alumni Ventures, SignalFire, Tribeca Venture Partners, and others. The New York-based company uses AI to help physicians identify optimal treatment strategies based on patient data. No new valuation or specific use of funds was disclosed in the available reporting.</p>
+  <a href="https://www.alleywatch.com/2026/09/nyc-startup-funding-top-largest-august-2026-vc" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+    </div>
+
+  </div>
+
+  <script>
+    const CONTEXT_PROMPT = `This is the archived Weekly Launch Digest for the week ending September 11, 2026.`;
+
+    async function openInClaude() {
+      const btn = document.getElementById('claude-btn');
+      const label = document.getElementById('btn-label');
+      const hint = document.getElementById('copy-hint');
+
+      try {
+        await navigator.clipboard.writeText(CONTEXT_PROMPT);
+        btn.classList.add('copied');
+        label.textContent = 'Copied!';
+        hint.classList.add('visible');
+      } catch (e) {
+        // Clipboard blocked (e.g. non-HTTPS) — open Claude anyway
+      }
+
+      window.open('https://claude.ai', '_blank');
+
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        label.textContent = 'Discuss in Claude.ai';
+        hint.classList.remove('visible');
+      }, 4000);
+    }
+  </script>
+
+</body>
+</html>

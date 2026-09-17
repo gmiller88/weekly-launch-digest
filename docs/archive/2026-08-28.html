@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weekly Launch Digest — August 28, 2026</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      min-height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: #f0f2f5;
+      color: #1a1a2e;
+    }
+
+    #page { max-width: 740px; margin: 0 auto; padding: 0 16px 48px; }
+
+    /* Header */
+    #digest-header {
+      background: #1a1a2e;
+      margin: 0 -16px;
+      padding: 24px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    #digest-header h1 {
+      font-size: 19px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.3px;
+    }
+
+    #digest-header .date { font-size: 12px; color: #8888aa; margin-top: 3px; }
+
+    #digest-header .archive-link {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #8899cc;
+      text-decoration: none;
+    }
+
+    #digest-header .archive-link:hover { color: #aabbee; }
+
+    /* Open in Claude button */
+    #claude-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #0055cc;
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      padding: 9px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+      flex-shrink: 0;
+    }
+
+    #claude-btn:hover { background: #0044aa; }
+    #claude-btn.copied { background: #007744; cursor: default; }
+    #claude-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    #copy-hint {
+      font-size: 11px;
+      color: #8888aa;
+      margin-top: 6px;
+      text-align: right;
+      display: none;
+    }
+
+    #copy-hint.visible { display: block; }
+
+    /* Sections */
+    .digest-section {
+      background: white;
+      border-radius: 8px;
+      padding: 24px 28px;
+      margin-top: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-label::before {
+      content: "";
+      display: inline-block;
+      width: 3px;
+      height: 14px;
+      border-radius: 2px;
+    }
+
+    .section-label.funding { color: #0055cc; }
+    .section-label.funding::before { background: #0055cc; }
+    .section-label.launches { color: #007744; }
+    .section-label.launches::before { background: #007744; }
+
+    /* ── Digest content (targets from digest/render.py) ───────────── */
+
+    .d-item {
+      margin-bottom: 32px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .d-item:last-child, .d-fund-item:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .d-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .d-title {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 600;
+      color: #1a1a2e;
+      flex: 1;
+      line-height: 1.4;
+    }
+
+    .d-score, .d-score-na {
+      display: inline-block;
+      color: white;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 700;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .d-score { background: #0055cc; font-size: 13px; }
+    .d-score-na { background: #777; font-size: 12px; }
+
+    .d-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .d-th {
+      padding: 6px 12px 6px 0;
+      vertical-align: top;
+      white-space: nowrap;
+      color: #555;
+      font-weight: 600;
+      width: 130px;
+      text-align: left;
+    }
+
+    .d-td { padding: 6px 0; color: #333; }
+    .d-table tr:nth-child(even) { background: #fafafa; }
+
+    .d-steal {
+      margin-top: 14px;
+      padding: 12px 14px;
+      background: #f2f7f4;
+      border-left: 3px solid #007744;
+      border-radius: 4px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #234;
+    }
+
+    .d-steal-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.1px;
+      text-transform: uppercase;
+      color: #007744;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .d-evidence {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #888;
+      line-height: 1.55;
+    }
+
+    .d-note {
+      font-style: italic;
+      color: #555;
+      margin-bottom: 20px;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .d-pattern {
+      margin-bottom: 24px;
+      padding: 14px 16px;
+      background: #f7f7fb;
+      border-left: 3px solid #0055cc;
+      border-radius: 4px;
+      font-size: 14px;
+      line-height: 1.7;
+      color: #333;
+    }
+
+    .d-pattern-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.1px;
+      text-transform: uppercase;
+      color: #0055cc;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .d-links { margin-top: 10px; font-size: 13px; }
+    .d-link { color: #0055cc; text-decoration: none; }
+    .d-link:hover { text-decoration: underline; }
+    .d-empty { color: #666; font-size: 14px; }
+
+    .d-fund-item {
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .d-fund-title {
+      margin: 0 0 8px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #1a1a2e;
+    }
+
+    .d-fund-body {
+      margin: 0 0 10px;
+      line-height: 1.65;
+      color: #333;
+      font-size: 14px;
+    }
+
+    /* Archive index */
+    .archive-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .archive-row:last-child { border-bottom: none; }
+    .archive-row a { color: #0055cc; text-decoration: none; font-weight: 600; font-size: 15px; }
+    .archive-row a:hover { text-decoration: underline; }
+    .archive-row .meta { font-size: 12px; color: #888; }
+
+    @media (max-width: 560px) {
+      .d-table, .d-table tbody, .d-table tr, .d-th, .d-td { display: block; width: auto; }
+      .d-th { padding-bottom: 0; }
+      .d-td { padding-top: 2px; padding-bottom: 10px; }
+      .d-table tr:nth-child(even) { background: transparent; }
+    }
+  </style>
+</head>
+<body>
+  <div id="page">
+
+    <div id="digest-header">
+      <div>
+        <h1>Weekly Launch Digest</h1>
+        <div class="date">Week ending August 28, 2026</div>
+        <a class="archive-link" href="../archive.html">Browse past weeks &rarr;</a>
+      </div>
+      <div>
+        <button id="claude-btn" onclick="openInClaude()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <span id="btn-label">Discuss in Claude.ai</span>
+        </button>
+        <div id="copy-hint">Digest copied &mdash; just paste into Claude.ai</div>
+      </div>
+    </div>
+
+    <div class="digest-section">
+      <div class="section-label launches">Top B2B Product Launches</div>
+      <p style="font-style: italic; color: #555; margin-bottom: 24px; font-size: 14px;"><strong>Analyst Note:</strong> This was a week almost entirely defined by one narrative: enterprise AI orchestration and the race to make agentic AI operational inside real business workflows. The Salesforce–Anthropic Claudeforce announcement dominated the conversation and crowded out nearly everything else in terms of signal-to-noise. Outside of that headline and one genuinely disruptive platform move from Shopify, the remaining batch was thin — a mix of press-release-grade martech updates, rebrand announcements, and early-stage startup launches that don't meet the bar for meaningful market impact. Only two launches this week clearly qualify under the stated criteria; a notional third is included but rated accordingly.</p>
+
+<div class="launch-item" style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #eee;">
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
+    <h3 style="margin: 0; font-size: 17px; font-weight: 600; color: #1a1a2e; flex: 1;">Salesforce + Anthropic — Claudeforce</h3>
+    <span style="display: inline-block; background: #0055cc; color: white; padding: 3px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-left: 12px; white-space: nowrap;">8.5/10</span>
+  </div>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.65;">
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600; width: 130px;">Company</td>
+      <td style="padding: 6px 0; color: #333;">Salesforce is the dominant enterprise CRM and cloud platform with hundreds of billions in market cap and a customer base spanning virtually every Fortune 500 company. Anthropic is one of the leading frontier AI labs, known for the Claude model family and its safety-first positioning. This is a partnership launch, not a startup play — but the execution and market impact clear the exceptional bar.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">The Launch</td>
+      <td style="padding: 6px 0; color: #333;">Claudeforce is a jointly branded product that runs Claude's reasoning and agentic capabilities directly on top of Salesforce's data layer, workflows, and governance infrastructure — delivered via a new UI harness called "Headless 360" alongside Tableau, Slack, and Data 360 integrations. The core value proposition: enterprises no longer have to choose between a capable reasoning model and a trusted, governed enterprise data environment. The system is designed to "think, reason, and act" within the guardrails enterprises already have in place.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Product Fit</td>
+      <td style="padding: 6px 0; color: #333;">This is a natural — if aggressive — extension of Salesforce's Agentforce platform, which has been the company's central strategic bet for the past 18 months. Embedding Claude gives Agentforce a credible answer to the "why not just use ChatGPT Enterprise?" objection by pairing frontier reasoning with Salesforce's unmatched enterprise data gravity. The stretch risk is integration depth: the AIforce UI harness and Headless 360 are new constructs that will require significant adoption before customers see the promised seamlessness.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Launch Playbook</td>
+      <td style="padding: 6px 0; color: #333;">Official press release on Salesforce.com timed to the Six Five Summit, a three-day virtual event that also featured Google Cloud, AWS, Oracle, IBM, Snowflake, and others — giving the announcement a built-in amplification context. Benioff delivered the keynote personally, framing it against a broad enterprise AI narrative. Multiple trade outlets (Solutions Review, AI Business Weekly, HPCwire) picked up the news within 24 hours. The co-branded name "Claudeforce" itself functions as a viral mechanic — it's memorable, derivative of both brand names, and designed for social sharing and headline writing.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Messaging</td>
+      <td style="padding: 6px 0; color: #333;">The headline frame — "#1 AI meets the #1 AI CRM" — is classic Benioff superlative stacking, designed to own both sides of the comparison. The more substantive message underneath is the probabilistic vs. deterministic framing: "Probabilistic intelligence alone doesn't run a company, and deterministic systems don't reason." This is a sophisticated positioning move that directly names the tension enterprises are wrestling with and positions Claudeforce as the synthesis. Notably left unsaid: pricing, availability timeline, and whether this displaces or coexists with Salesforce's existing Einstein AI investments.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Why This Rating</td>
+      <td style="padding: 6px 0; color: #333;">The probabilistic/deterministic framing is genuinely sharp PMM work — it gives enterprise buyers a conceptual handle on a complex problem and positions the product as the only logical resolution. The co-branded naming and Benioff keynote slot ensured broad pickup without requiring a press embargo circus. It lands at 8.5 rather than a 9+ because the product constructs (Headless 360, AIforce UI harness) are new and unexplained enough to invite skepticism, and the launch would have been stronger with a marquee customer co-announcement to ground the claims in realized value.</td>
+    </tr>
+  </table>
+
+  <div style="margin-top: 10px;">
+    <a href="https://www.salesforce.com/news/press-releases/2026/08/26/salesforce-and-anthropic-announce-claudeforce" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+  </div>
+</div>
+
+<div class="launch-item" style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #eee;">
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
+    <h3 style="margin: 0; font-size: 17px; font-weight: 600; color: #1a1a2e; flex: 1;">Shopify — Flow 3.0 + Native B2B Checkout</h3>
+    <span style="display: inline-block; background: #0055cc; color: white; padding: 3px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-left: 12px; white-space: nowrap;">7.5/10</span>
+  </div>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.65;">
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600; width: 130px;">Company</td>
+      <td style="padding: 6px 0; color: #333;">Shopify is the leading e-commerce infrastructure platform serving millions of merchants globally, with a market cap exceeding $100B. Its B2B segment has been a growth priority since 2022, historically gated behind its Plus tier. This qualifies under the "exceptional market impact" threshold given the direct competitive displacement it creates within the Shopify partner ecosystem.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">The Launch</td>
+      <td style="padding: 6px 0; color: #333;">Shopify reached general availability on two interconnected releases: Flow 3.0, a rebuilt workflow automation engine, and a native B2B checkout layer. Together they replace a category of third-party automation apps priced at $200–$800/month and wholesale/B2B tools at $49–$199/month. The strategic unlock is that key B2B features — company profiles, payment terms, volume pricing, ACH payments, vaulted credit cards — are now available at no additional cost on Basic, Grow, and Advanced plans, not just Shopify Plus.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Product Fit</td>
+      <td style="padding: 6px 0; color: #333;">This is a direct continuation of Shopify's long-running strategy to collapse the app ecosystem for high-value, high-frequency use cases into the core platform — a pattern it has followed with payments, shipping, POS, and email. The B2B checkout layer specifically fills the largest remaining gap in Shopify's native commerce stack for wholesale merchants and manufacturer-distributors. The risk is ecosystem backlash: third-party app developers whose businesses are now structurally undermined are a real stakeholder group with influence over agency recommendations.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Launch Playbook</td>
+      <td style="padding: 6px 0; color: #333;">Notably, this launched with minimal fanfare — no dedicated event, no press embargo campaign, no influencer seeding documented in the coverage. General availability was announced via the Shopify Changelog, picked up by SaaSRise and trade coverage shortly after. This "quiet GA" approach is consistent with Shopify's engineering-led communications style but likely undersells the strategic significance. The April 2026 pricing change announcement (opening B2B to non-Plus plans) laid the groundwork and generated some earlier trade attention.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Messaging</td>
+      <td style="padding: 6px 0; color: #333;">The framing in trade coverage centers on disruption — "upending the third-party app ecosystem" — but this language appears to be the analyst/journalist interpretation, not Shopify's own positioning. Shopify has not publicly framed this as a competitive displacement move against its own partners, which is a deliberate and politically necessary omission. The merchant-facing message, to the extent it exists, is pure value: enterprise-grade B2B commerce capability at a lower plan tier with no added cost.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Why This Rating</td>
+      <td style="padding: 6px 0; color: #333;">The product impact is genuinely significant — it changes the build-vs-buy calculus for thousands of B2B merchants and structurally alters the Shopify app partner market overnight. The score is held to 7.5 rather than higher because the launch execution itself was deliberately muted, leaving substantial awareness and narrative impact on the table. A PMM team that had built a proper go-to-market campaign around this — merchant case studies, a dedicated landing page, agency transition guides — could have extracted considerably more signal from the same product move.</td>
+    </tr>
+  </table>
+
+  <div style="margin-top: 10px;">
+    <a href="https://www.saasrise.com/news/shopify-rolls-out-flow-30-and-native-b2b-checkout-upending-thirdparty-app-ecosystem-371d5e09-3997-4ba9-8b0a-ffbfe4889cc5" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+  </div>
+</div>
+
+<div class="launch-item" style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #eee;">
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
+    <h3 style="margin: 0; font-size: 17px; font-weight: 600; color: #1a1a2e; flex: 1;">6sense — AI Agent Data Integration (Intent-to-Agent Routing)</h3>
+    <span style="display: inline-block; background: #0055cc; color: white; padding: 3px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-left: 12px; white-space: nowrap;">5.5/10</span>
+  </div>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.65;">
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600; width: 130px;">Company</td>
+      <td style="padding: 6px 0; color: #333;">6sense is a revenue intelligence platform for B2B go-to-market teams, known for its account-level intent data, predictive AI, and dark funnel analysis. The company is growth-stage, having raised north of $200M and operating at meaningful scale within the enterprise ABM space.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">The Launch</td>
+      <td style="padding: 6px 0; color: #333;">6sense launched product updates that route its core revenue signals — B2B intent data, account stage predictions, and buying committee insights — directly into external AI agents including Claude, ChatGPT, and Salesforce Agentforce. The value proposition is that AI agents acting on behalf of sales and marketing teams can now be grounded in 6sense's proprietary intent layer rather than operating on generic or CRM-only data.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Product Fit</td>
+      <td style="padding: 6px 0; color: #333;">This is a well-reasoned strategic extension. 6sense's core moat is the quality and proprietary nature of its intent data;
+    </div>
+
+    <div class="digest-section">
+      <div class="section-label funding">VC Funding Announcements</div>
+      <div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Instinct</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Instinct, an AI assistant startup, is in talks to raise a round of at least $200 million that would value the company at over $2.5 billion. Benchmark and Index Ventures are in discussions to lead the round. This follows a $75 million Series A led by Kleiner Perkins' Mamoon Hamid in early August, which valued Instinct at over $500 million. The company is currently free to use and is exploring a subscription model positioning it as a "chief of staff" for users.</p>
+  <a href="https://www.forbes.com/sites/iainmartin/2026/08/26/vcs-are-so-obsessed-with-this-ai-assistant-that-its-valuation-jumped-fivefold-in-weeks" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">General Intuition</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">New York-based General Intuition, which builds a foundation model for generalized AI agents, is in talks to raise a new round at a $6 billion pre-money valuation from new investors including Valor Equity Partners, Point72 Ventures, and Seven Seven Six. Existing investors General Catalyst and Khosla Ventures are also participating. The raise comes just weeks after the company closed a $320 million round at a $2.3 billion valuation. No specific use of funds was disclosed.</p>
+  <a href="https://techcrunch.com/2026/08/24/valor-point72-back-general-intuition-at-6b-valuation-as-ai-startup-pushes-into-robotics" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Space (file management startup)</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">San Francisco-based Space raised $2.4 million in pre-seed funding led by a16z Speedrun, with additional participation from Golden Ventures, Northside Ventures, and angel investors. The company is building a file management system that gives users streaming-style access to cloud data from local machines without requiring full file downloads. Co-founders Jason Zhao, Matthew Ao, and Arihant Bapna are targeting creators, CAD users, and AI agents with what they describe as an "infinite computer" model. Use of funds was not specified.</p>
+  <a href="https://www.instagram.com/p/Dcd1xinEW-0" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Uplift</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Uplift, an Austin-based early-stage startup focused on home technology, closed a $7 million seed round led by Andreessen Horowitz (a16z). The company was founded by Charlie Nitschelm, previously at SpaceX, and Trevor O'Leary, previously at Tesla. Funds are earmarked for recruiting a founding engineering team across mechanical, electrical, software, and manufacturing disciplines. No revenue, user metrics, or prior funding rounds were disclosed.</p>
+  <a href="https://theventurecodex.com/funds/andreessen-horowitz" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+    </div>
+
+  </div>
+
+  <script>
+    const CONTEXT_PROMPT = `This is the archived Weekly Launch Digest for the week ending August 28, 2026.`;
+
+    async function openInClaude() {
+      const btn = document.getElementById('claude-btn');
+      const label = document.getElementById('btn-label');
+      const hint = document.getElementById('copy-hint');
+
+      try {
+        await navigator.clipboard.writeText(CONTEXT_PROMPT);
+        btn.classList.add('copied');
+        label.textContent = 'Copied!';
+        hint.classList.add('visible');
+      } catch (e) {
+        // Clipboard blocked (e.g. non-HTTPS) — open Claude anyway
+      }
+
+      window.open('https://claude.ai', '_blank');
+
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        label.textContent = 'Discuss in Claude.ai';
+        hint.classList.remove('visible');
+      }, 4000);
+    }
+  </script>
+
+</body>
+</html>

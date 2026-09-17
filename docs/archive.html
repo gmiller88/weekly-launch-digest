@@ -1,20 +1,10 @@
-import glob
-import os
-import re
-from datetime import datetime
-
-from . import render
-
-
-def _escape_for_js_template(text: str) -> str:
-    """Escape text for safe embedding in a JS template literal."""
-    text = text.replace("\\", "\\\\")
-    text = text.replace("`", "\\`")
-    text = text.replace("${", "\\${")
-    return text
-
-
-_STYLE = """\
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weekly Launch Digest — Archive</title>
+  <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     html, body {
@@ -290,220 +280,36 @@ _STYLE = """\
       .d-td { padding-top: 2px; padding-bottom: 10px; }
       .d-table tr:nth-child(even) { background: transparent; }
     }
-"""
-
-_PAGE = """\
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Weekly Launch Digest — DATE_PLACEHOLDER</title>
-  <style>
-STYLE_PLACEHOLDER  </style>
-</head>
-<body>
-  <div id="page">
-
-    <div id="digest-header">
-      <div>
-        <h1>Weekly Launch Digest</h1>
-        <div class="date">Week ending DATE_PLACEHOLDER</div>
-        <a class="archive-link" href="ARCHIVE_HREF_PLACEHOLDER">Browse past weeks &rarr;</a>
-      </div>
-      <div>
-        <button id="claude-btn" onclick="openInClaude()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-          </svg>
-          <span id="btn-label">Discuss in Claude.ai</span>
-        </button>
-        <div id="copy-hint">Digest copied &mdash; just paste into Claude.ai</div>
-      </div>
-    </div>
-
-    <div class="digest-section">
-      <div class="section-label launches">Top B2B Product Launches</div>
-      LAUNCHES_CONTENT_PLACEHOLDER
-    </div>
-
-    <div class="digest-section">
-      <div class="section-label funding">VC Funding Announcements</div>
-      FUNDING_CONTENT_PLACEHOLDER
-    </div>
-
-  </div>
-
-  <script>
-    const CONTEXT_PROMPT = `CONTEXT_PROMPT_PLACEHOLDER`;
-
-    async function openInClaude() {
-      const btn = document.getElementById('claude-btn');
-      const label = document.getElementById('btn-label');
-      const hint = document.getElementById('copy-hint');
-
-      try {
-        await navigator.clipboard.writeText(CONTEXT_PROMPT);
-        btn.classList.add('copied');
-        label.textContent = 'Copied!';
-        hint.classList.add('visible');
-      } catch (e) {
-        // Clipboard blocked (e.g. non-HTTPS) — open Claude anyway
-      }
-
-      window.open('https://claude.ai', '_blank');
-
-      setTimeout(() => {
-        btn.classList.remove('copied');
-        label.textContent = 'Discuss in Claude.ai';
-        hint.classList.remove('visible');
-      }, 4000);
-    }
-  </script>
-
-</body>
-</html>"""
-
-_ARCHIVE_PAGE = """\
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Weekly Launch Digest — Archive</title>
-  <style>
-STYLE_PLACEHOLDER  </style>
+  </style>
 </head>
 <body>
   <div id="page">
     <div id="digest-header">
       <div>
         <h1>Weekly Launch Digest</h1>
-        <div class="date">Archive &mdash; COUNT_PLACEHOLDER editions</div>
+        <div class="date">Archive &mdash; 15 editions</div>
         <a class="archive-link" href="index.html">&larr; Latest edition</a>
       </div>
     </div>
 
     <div class="digest-section">
       <div class="section-label launches">Past Editions</div>
-      ROWS_PLACEHOLDER
+      <div class="archive-row"><a href="archive/2026-09-11.html">September 11, 2026</a><span class="meta">3 launches &middot; top score 8/10</span></div>
+      <div class="archive-row"><a href="archive/2026-09-04.html">September 04, 2026</a><span class="meta">3 launches &middot; top score 7/10</span></div>
+      <div class="archive-row"><a href="archive/2026-08-28.html">August 28, 2026</a><span class="meta">3 launches &middot; top score 8.5/10</span></div>
+      <div class="archive-row"><a href="archive/2026-08-21.html">August 21, 2026</a><span class="meta">3 launches &middot; top score 6/10</span></div>
+      <div class="archive-row"><a href="archive/2026-08-14.html">August 14, 2026</a><span class="meta">2 launches &middot; top score 5/10</span></div>
+      <div class="archive-row"><a href="archive/2026-08-07.html">August 07, 2026</a><span class="meta">3 launches &middot; top score 8.5/10</span></div>
+      <div class="archive-row"><a href="archive/2026-07-31.html">July 31, 2026</a><span class="meta">3 launches &middot; top score 6/10</span></div>
+      <div class="archive-row"><a href="archive/2026-07-24.html">July 24, 2026</a><span class="meta">2 launches &middot; top score 7/10</span></div>
+      <div class="archive-row"><a href="archive/2026-07-17.html">July 17, 2026</a><span class="meta">3 launches &middot; top score 7/10</span></div>
+      <div class="archive-row"><a href="archive/2026-07-10.html">July 10, 2026</a><span class="meta">3 launches &middot; top score 7/10</span></div>
+      <div class="archive-row"><a href="archive/2026-07-03.html">July 03, 2026</a><span class="meta">3 launches &middot; top score 7/10</span></div>
+      <div class="archive-row"><a href="archive/2026-06-26.html">June 26, 2026</a><span class="meta">3 launches &middot; top score 6/10</span></div>
+      <div class="archive-row"><a href="archive/2026-06-19.html">June 19, 2026</a><span class="meta">2 launches &middot; top score 6/10</span></div>
+      <div class="archive-row"><a href="archive/2026-06-12.html">June 12, 2026</a><span class="meta">3 launches &middot; top score 8/10</span></div>
+      <div class="archive-row"><a href="archive/2026-06-05.html">June 05, 2026</a><span class="meta">3 launches &middot; top score 7/10</span></div>
     </div>
   </div>
 </body>
-</html>"""
-
-
-def _build_page(
-    funding_html: str,
-    launches_html: str,
-    date_label: str,
-    context_prompt: str,
-    archive_href: str,
-) -> str:
-    return (
-        _PAGE
-        .replace("STYLE_PLACEHOLDER", _STYLE)
-        .replace("DATE_PLACEHOLDER", date_label)
-        .replace("ARCHIVE_HREF_PLACEHOLDER", archive_href)
-        .replace("FUNDING_CONTENT_PLACEHOLDER", funding_html)
-        .replace("LAUNCHES_CONTENT_PLACEHOLDER", launches_html)
-        .replace("CONTEXT_PROMPT_PLACEHOLDER", _escape_for_js_template(context_prompt))
-    )
-
-
-def _write(path: str, content: str) -> None:
-    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
-    with open(path, "w", encoding="utf-8") as f:
-        f.write(content)
-
-
-def write_archive_index(output_dir: str = "docs") -> int:
-    """Rebuild the archive index from the dated pages on disk."""
-    paths = sorted(
-        glob.glob(os.path.join(output_dir, "archive", "*.html")), reverse=True
-    )
-
-    rows = []
-    for path in paths:
-        iso = os.path.splitext(os.path.basename(path))[0]
-        try:
-            label = datetime.strptime(iso, "%Y-%m-%d").strftime("%B %d, %Y")
-        except ValueError:
-            label = iso
-
-        html = ""
-        try:
-            with open(path, encoding="utf-8") as f:
-                html = f.read()
-        except OSError:
-            pass
-
-        # Tolerate both the current markup and the pre-rewrite inline-styled
-        # pages that were backfilled into the archive.
-        scores = [float(s) for s in re.findall(r">\s*([\d.]+)\s*/\s*10\s*<", html)]
-        count = html.count('class="d-item"') + html.count('class="launch-item"')
-        meta = f"{count} launch{'es' if count != 1 else ''}"
-        if scores:
-            meta += f" &middot; top score {max(scores):g}/10"
-
-        rows.append(
-            f'<div class="archive-row">'
-            f'<a href="archive/{iso}.html">{label}</a>'
-            f'<span class="meta">{meta}</span>'
-            f"</div>"
-        )
-
-    if not rows:
-        rows = ['<p class="d-empty">No archived editions yet.</p>']
-
-    page = (
-        _ARCHIVE_PAGE
-        .replace("STYLE_PLACEHOLDER", _STYLE)
-        .replace("COUNT_PLACEHOLDER", str(len(paths)))
-        .replace("ROWS_PLACEHOLDER", "\n      ".join(rows))
-    )
-    _write(os.path.join(output_dir, "archive.html"), page)
-    return len(paths)
-
-
-def write_digest_page(
-    funding: dict,
-    launches: dict,
-    date_label: str | None = None,
-    date_iso: str | None = None,
-    output_dir: str = "docs",
-) -> None:
-    """Write this week's page, its permanent dated copy, and the archive index."""
-    date_label = date_label or datetime.now().strftime("%B %d, %Y")
-    date_iso = date_iso or datetime.now().strftime("%Y-%m-%d")
-
-    funding_html = render.render_funding(funding)
-    launches_html = render.render_launches(launches)
-
-    context_prompt = (
-        f"You are a helpful assistant with deep expertise in B2B product marketing "
-        f"and the startup ecosystem. I've just read my Weekly Launch Digest for the "
-        f"week ending {date_label} and want to dig deeper on some of what I read. "
-        f"Here's the full digest:\n\n"
-        f"{render.plain_text(funding, launches)}\n\n"
-        f"I'll ask you follow-up questions."
-    )
-
-    # Permanent dated copy — the archive is the training material.
-    _write(
-        os.path.join(output_dir, "archive", f"{date_iso}.html"),
-        _build_page(
-            funding_html, launches_html, date_label, context_prompt, "../archive.html"
-        ),
-    )
-
-    # Current edition.
-    _write(
-        os.path.join(output_dir, "index.html"),
-        _build_page(
-            funding_html, launches_html, date_label, context_prompt, "archive.html"
-        ),
-    )
-
-    total = write_archive_index(output_dir)
-    print(f"  wrote index.html + archive/{date_iso}.html ({total} editions archived)")
+</html>

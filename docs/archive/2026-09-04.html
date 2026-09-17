@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weekly Launch Digest — September 04, 2026</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      min-height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: #f0f2f5;
+      color: #1a1a2e;
+    }
+
+    #page { max-width: 740px; margin: 0 auto; padding: 0 16px 48px; }
+
+    /* Header */
+    #digest-header {
+      background: #1a1a2e;
+      margin: 0 -16px;
+      padding: 24px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    #digest-header h1 {
+      font-size: 19px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.3px;
+    }
+
+    #digest-header .date { font-size: 12px; color: #8888aa; margin-top: 3px; }
+
+    #digest-header .archive-link {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #8899cc;
+      text-decoration: none;
+    }
+
+    #digest-header .archive-link:hover { color: #aabbee; }
+
+    /* Open in Claude button */
+    #claude-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #0055cc;
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      padding: 9px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+      flex-shrink: 0;
+    }
+
+    #claude-btn:hover { background: #0044aa; }
+    #claude-btn.copied { background: #007744; cursor: default; }
+    #claude-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    #copy-hint {
+      font-size: 11px;
+      color: #8888aa;
+      margin-top: 6px;
+      text-align: right;
+      display: none;
+    }
+
+    #copy-hint.visible { display: block; }
+
+    /* Sections */
+    .digest-section {
+      background: white;
+      border-radius: 8px;
+      padding: 24px 28px;
+      margin-top: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-label::before {
+      content: "";
+      display: inline-block;
+      width: 3px;
+      height: 14px;
+      border-radius: 2px;
+    }
+
+    .section-label.funding { color: #0055cc; }
+    .section-label.funding::before { background: #0055cc; }
+    .section-label.launches { color: #007744; }
+    .section-label.launches::before { background: #007744; }
+
+    /* ── Digest content (targets from digest/render.py) ───────────── */
+
+    .d-item {
+      margin-bottom: 32px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .d-item:last-child, .d-fund-item:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .d-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .d-title {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 600;
+      color: #1a1a2e;
+      flex: 1;
+      line-height: 1.4;
+    }
+
+    .d-score, .d-score-na {
+      display: inline-block;
+      color: white;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 700;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .d-score { background: #0055cc; font-size: 13px; }
+    .d-score-na { background: #777; font-size: 12px; }
+
+    .d-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .d-th {
+      padding: 6px 12px 6px 0;
+      vertical-align: top;
+      white-space: nowrap;
+      color: #555;
+      font-weight: 600;
+      width: 130px;
+      text-align: left;
+    }
+
+    .d-td { padding: 6px 0; color: #333; }
+    .d-table tr:nth-child(even) { background: #fafafa; }
+
+    .d-steal {
+      margin-top: 14px;
+      padding: 12px 14px;
+      background: #f2f7f4;
+      border-left: 3px solid #007744;
+      border-radius: 4px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #234;
+    }
+
+    .d-steal-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.1px;
+      text-transform: uppercase;
+      color: #007744;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .d-evidence {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #888;
+      line-height: 1.55;
+    }
+
+    .d-note {
+      font-style: italic;
+      color: #555;
+      margin-bottom: 20px;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .d-pattern {
+      margin-bottom: 24px;
+      padding: 14px 16px;
+      background: #f7f7fb;
+      border-left: 3px solid #0055cc;
+      border-radius: 4px;
+      font-size: 14px;
+      line-height: 1.7;
+      color: #333;
+    }
+
+    .d-pattern-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.1px;
+      text-transform: uppercase;
+      color: #0055cc;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .d-links { margin-top: 10px; font-size: 13px; }
+    .d-link { color: #0055cc; text-decoration: none; }
+    .d-link:hover { text-decoration: underline; }
+    .d-empty { color: #666; font-size: 14px; }
+
+    .d-fund-item {
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .d-fund-title {
+      margin: 0 0 8px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #1a1a2e;
+    }
+
+    .d-fund-body {
+      margin: 0 0 10px;
+      line-height: 1.65;
+      color: #333;
+      font-size: 14px;
+    }
+
+    /* Archive index */
+    .archive-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .archive-row:last-child { border-bottom: none; }
+    .archive-row a { color: #0055cc; text-decoration: none; font-weight: 600; font-size: 15px; }
+    .archive-row a:hover { text-decoration: underline; }
+    .archive-row .meta { font-size: 12px; color: #888; }
+
+    @media (max-width: 560px) {
+      .d-table, .d-table tbody, .d-table tr, .d-th, .d-td { display: block; width: auto; }
+      .d-th { padding-bottom: 0; }
+      .d-td { padding-top: 2px; padding-bottom: 10px; }
+      .d-table tr:nth-child(even) { background: transparent; }
+    }
+  </style>
+</head>
+<body>
+  <div id="page">
+
+    <div id="digest-header">
+      <div>
+        <h1>Weekly Launch Digest</h1>
+        <div class="date">Week ending September 04, 2026</div>
+        <a class="archive-link" href="../archive.html">Browse past weeks &rarr;</a>
+      </div>
+      <div>
+        <button id="claude-btn" onclick="openInClaude()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <span id="btn-label">Discuss in Claude.ai</span>
+        </button>
+        <div id="copy-hint">Digest copied &mdash; just paste into Claude.ai</div>
+      </div>
+    </div>
+
+    <div class="digest-section">
+      <div class="section-label launches">Top B2B Product Launches</div>
+      <p style="font-style: italic; color: #555; margin-bottom: 24px; font-size: 14px;"><strong>Analyst Note:</strong> This was a notably thin week for high-impact B2B software launches, with the article set dominated by noise — consumer hardware from IFA, SEO content farms, and Product Hunt meta-content rather than actual launches. The launches that did surface cluster tightly around agentic AI tooling, suggesting the market is deep in an "every product gets an AI agent" cycle. Only two launches clear the bar with any confidence; a third is included at a lower score to round out the set, but readers should weight it accordingly.</p>
+
+<div class="launch-item" style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #eee;">
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
+    <h3 style="margin: 0; font-size: 17px; font-weight: 600; color: #1a1a2e; flex: 1;">NVIDIA + CrowdStrike — SafeMind Agentic Cyber Defense Platform</h3>
+    <span style="display: inline-block; background: #0055cc; color: white; padding: 3px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-left: 12px; white-space: nowrap;">7/10</span>
+  </div>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.65;">
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600; width: 130px;">Company</td>
+      <td style="padding: 6px 0; color: #333;">NVIDIA is the dominant GPU and AI infrastructure platform; CrowdStrike is the market-leading endpoint and cloud security vendor with ~$4B+ ARR. Both are large-cap public companies, included here because the co-launch represents a genuinely new product category rather than a feature update.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">The Launch</td>
+      <td style="padding: 6px 0; color: #333;">SafeMind is a jointly developed agentic AI security tool that combines NVIDIA's accelerated computing and AI inference capabilities with CrowdStrike's threat intelligence and detection platform. The core value proposition is autonomous threat detection and response — an AI agent that acts, not just alerts — compressing the security operations loop from hours to seconds.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Product Fit</td>
+      <td style="padding: 6px 0; color: #333;">A natural extension for both companies. CrowdStrike has been pushing autonomous SOC capabilities for two years; NVIDIA has been aggressively positioning its NIM microservices and accelerated computing stack for enterprise AI use cases beyond training. The pairing directly addresses CrowdStrike's existing Falcon platform customers who want faster, AI-native response — no significant product stretch visible from available details.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Launch Playbook</td>
+      <td style="padding: 6px 0; color: #333;">Trade press pickup via The Tech Buzz (specialist AI/tech media); the joint brand announcement is the primary activation mechanic here, leveraging both companies' substantial owned audiences and PR machines. No conference keynote, waitlist, or customer co-announcement is evident from available coverage — the launch appears to have been a coordinated press drop rather than a full campaign build.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Messaging</td>
+      <td style="padding: 6px 0; color: #333;">Positioned squarely on "agentic cyber defense" — a deliberate category label that differentiates from the incumbent "AI-assisted" framing most SIEM and XDR vendors use. By calling it agentic, both companies signal autonomous action rather than analyst augmentation, which is a meaningful narrative escalation. What's notably absent from coverage: any specifics on pricing, deployment model, or which CrowdStrike SKU this attaches to — suggesting either an early access phase or a messaging choice to lead with vision over mechanics.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Why This Rating</td>
+      <td style="padding: 6px 0; color: #333;">The partnership pairing is strategically compelling and the "agentic" category framing is sharp for this moment in the market. Score is held back by thin coverage detail — only one trade outlet surfaced, no Tier-1 tech press pickup is confirmed, and the launch playbook appears to be a press release rather than a fully orchestrated campaign. More execution evidence would push this to an 8 or 9.</td>
+    </tr>
+  </table>
+
+  <div style="margin-top: 10px;">
+    <a href="https://www.techbuzz.ai/articles/nvidia-crowdstrike-unveil-agentic-ai-security-tool" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+  </div>
+</div>
+
+<div class="launch-item" style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #eee;">
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
+    <h3 style="margin: 0; font-size: 17px; font-weight: 600; color: #1a1a2e; flex: 1;">Walnut — Enterprise AI Agent Platform (AI Mode + Walnut Xpert)</h3>
+    <span style="display: inline-block; background: #0055cc; color: white; padding: 3px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-left: 12px; white-space: nowrap;">6/10</span>
+  </div>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.65;">
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600; width: 130px;">Company</td>
+      <td style="padding: 6px 0; color: #333;">Walnut is a growth-stage B2B SaaS company offering a sales demo and buyer experience platform used by go-to-market teams at hundreds of software companies. The company has previously raised venture funding and is a recognized player in the sales enablement and interactive demo category.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">The Launch</td>
+      <td style="padding: 6px 0; color: #333;">Walnut launched a family of AI agents covering both sides of the buying experience: AI Mode for Playlists and Deal Rooms (which generates personalized buyer-facing experiences from a single prompt) and Walnut Xpert (a buyer-facing agent that lets prospects ask questions and self-navigate product demos). These join two existing AI features already on the platform, positioning the full suite as a coordinated AI layer across the buyer journey.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Product Fit</td>
+      <td style="padding: 6px 0; color: #333;">Tight product fit — Walnut's core competency is interactive demo creation and personalization, and this launch extends that capability from rep-led to fully AI-automated and buyer-led. It also deepens the Deal Room feature set, which is increasingly the stickiest part of modern sales enablement platforms. No meaningful stretch; this is a disciplined expansion within an established wedge.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Launch Playbook</td>
+      <td style="padding: 6px 0; color: #333;">Coverage appeared on HackerNoon, which signals a content-led distribution strategy targeting developer-adjacent and founder audiences rather than traditional B2B press. No conference keynote, customer co-announcement, or Tier-1 media pickup is evident. The framing of launching a "family" of agents suggests a deliberate portfolio announcement rather than a single feature drop — a useful tactic for generating broader coverage surface area from a single moment.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Messaging</td>
+      <td style="padding: 6px 0; color: #333;">The narrative hook — "personalization no longer has to be reserved for a company's largest opportunities" — is the strongest element of this launch. It directly addresses a real sales ops pain point (demo personalization doesn't scale) and signals market democratization, a reliable B2B growth framing. The dual-sided framing (seller agent + buyer agent) is smart positioning that competitors in the Consensus/Navattic space haven't matched as cleanly. Left unsaid: any data on conversion lift or customer proof points to substantiate the claims.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Why This Rating</td>
+      <td style="padding: 6px 0; color: #333;">The messaging strategy is genuinely well-crafted and the product logic is sound, but the distribution execution is limited — HackerNoon is a content platform with variable audience quality, and there's no evidence of a broader channel mix, customer validation, or PR push. A launch this strategically coherent deserved a bigger stage; the gap between messaging quality and distribution ambition holds this to a 6.</td>
+    </tr>
+  </table>
+
+  <div style="margin-top: 10px;">
+    <a href="https://hackernoon.com/walnut-launches-enterprise-ai-agent-platform-to-personalize-the-b2b-buyer-experience" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+  </div>
+</div>
+
+<div class="launch-item" style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #eee;">
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
+    <h3 style="margin: 0; font-size: 17px; font-weight: 600; color: #1a1a2e; flex: 1;">Dreamdata — Dreamdata AI (Analytics Agent, MCP Server + Data Warehouse)</h3>
+    <span style="display: inline-block; background: #0055cc; color: white; padding: 3px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-left: 12px; white-space: nowrap;">6/10</span>
+  </div>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.65;">
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600; width: 130px;">Company</td>
+      <td style="padding: 6px 0; color: #333;">Dreamdata is a B2B revenue attribution platform, primarily serving mid-market SaaS companies in Europe and the US. The company is growth-stage, with a customer base that includes names like Finastra, and has carved out a niche in multi-touch attribution for complex B2B buying cycles where traditional GA-style tools fail.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">The Launch</td>
+      <td style="padding: 6px 0; color: #333;">Dreamdata AI is a three-product suite: an Analytics Agent (natural language querying of revenue data), an MCP Server (allowing Claude, ChatGPT, and other LLM clients to query Dreamdata's governed semantic layer without recalculating or hallucinating numbers), and a Data Warehouse export. The defining technical claim is that the semantic layer prevents AI tools from altering or recomputing attribution figures — directly addressing the hallucination problem in AI-generated analytics.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Product Fit</td>
+      <td style="padding: 6px 0; color: #333;">Strong strategic fit. Dreamdata's core defensibility has always been the quality and trustworthiness of its attribution data model; wrapping that in a governed semantic layer and exposing it via MCP is a logical moat-deepening move. The MCP Server specifically is a clever platform play — it makes Dreamdata data accessible inside tools buyers are already using (Claude, ChatGPT) rather than requiring workflow changes. The Data Warehouse add-on is a straightforward enterprise land-and-expand play.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Launch Playbook</td>
+      <td style="padding: 6px 0; color: #333;">Coverage landed on PPC Land, a performance marketing trade publication — a smart channel choice given Dreamdata's ICP (demand gen and revenue ops teams). Pilot customers Siro and Finastra are named and quoted, which is the launch's most credible execution element. A pilot phase preceding the public launch suggests a controlled rollout with feedback baked in. However, no conference anchor, broader press push, or social amplification evidence is present in available coverage.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Messaging</td>
+      <td style="padding: 6px 0; color: #333;">The headline angle — "MCP server so Claude and ChatGPT cannot alter its B2B numbers"
+    </div>
+
+    <div class="digest-section">
+      <div class="section-label funding">VC Funding Announcements</div>
+      <div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Town</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Town, an AI personal assistant startup, is closing in on a $1 billion valuation in a new funding round led by Index Ventures. The round has not yet been fully disclosed but would make Town a unicorn. Index Ventures is also leading a separate round for Instinct, another AI personal assistant company, alongside Benchmark — bringing Instinct's total raised to $350 million at a $2.5 billion valuation. Funds are expected to support product expansion as investor interest in personal AI agent tools accelerates.</p>
+  <a href="https://www.inc.com/kevin-haynes/personal-assistants-are-suddenly-venture-capitals-new-obsession-startup-town-is-closing-in-on-a-1-billion-valuation/91398323" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Instinct</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Instinct, an AI-powered personal assistant for individual consumers, completed a new funding round led by Index Ventures with participation from Benchmark, bringing its total capital raised to $350 million. The company is now valued at $2.5 billion. No specific use of funds was detailed in the available reporting beyond continued product development in the personal AI agent category.</p>
+  <a href="https://www.inc.com/kevin-haynes/personal-assistants-are-suddenly-venture-capitals-new-obsession-startup-town-is-closing-in-on-a-1-billion-valuation/91398323" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Easy Aerial</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Easy Aerial, a maker of U.S.-built autonomous drones for defense, security, and emergency response, raised a $20 million Series B round. Insight Partners participated in the round alongside Entrée Capital. The company plans to use the funds for global expansion and increased production capabilities.</p>
+  <a href="https://www.automate.org/robotics/industry-insights/robotics-raises-able-labs-easy-aerial-lupin-dental-motion-reframe-systems" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Vals AI</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">San Francisco-based Vals AI raised a $40 million Series A led by Andreessen Horowitz (a16z), valuing the company at $400 million. Vals AI builds independent benchmarks that evaluate frontier AI models on real professional tasks rather than academic leaderboards. Use of funds was not detailed in the available reporting.</p>
+  <a href="https://valueaddvc.com/pulse/company/andreessen-horowitz" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Metal</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Metal, a software startup that helps founders manage venture fundraising and investor relations, raised a $4.5 million seed round backed by Andreessen Horowitz (a16z), Y Combinator, and Phaze Ventures, with additional participation from Pioneer Fund, Gaingels, and Team Ignite Ventures. The company's platform ranks prospective investors by stage, sector, geography, and check size, and also handles research, introductions, and pipeline management. Metal plans to extend its product beyond active fundraising into ongoing investor relations.</p>
+  <a href="https://www.fwdstart.me/p/usman-gul-s-metal-raises-4-5m-seed-backed-by-a16z-yc-and-phaze-ventures" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Félix</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Félix, a Miami-based fintech connecting U.S. Latino users with family across Latin America through conversational banking and remittances, raised $200 million in a new round. Andreessen Horowitz (a16z crypto) led the equity portion, with QED Investors also participating; General Catalyst provided $113 million in debt financing. The company plans to use the capital to expand financial tools for the U.S. Latino community and grow its global reach.</p>
+  <a href="https://www.miamiherald.com/news/business/article317076435.html" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Profound</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Profound, a startup focused on generative engine optimization (GEO) as an emerging alternative to traditional SEO, raised $96 million in a Series C round led by Lightspeed Venture Partners. Sequoia Capital and Kleiner Perkins also participated, alongside Evantic, Saga Ventures, and South Park Commons. No specific use of funds was detailed in the available reporting.</p>
+  <a href="https://www.newcomer.co/p/investors-are-betting-on-agents-that" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Atira</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Munich-based Atira raised $17.5 million in total funding, comprising a $15 million seed round led by Accel and a previously undisclosed $2.5 million pre-seed. The company uses AI to automate paperwork and due diligence processes in industrial dealmaking. Additional investors include UVC Partners, Fortino, and BOOOM, along with several individual backers. Atira did not disclose its valuation.</p>
+  <a href="https://fortune.com/2026/09/03/exclusive-german-ai-startup-atira-raises-17-5-million-to-unclog-the-paperwork-bottleneck-in-industrial-dealmaking" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+    </div>
+
+  </div>
+
+  <script>
+    const CONTEXT_PROMPT = `This is the archived Weekly Launch Digest for the week ending September 04, 2026.`;
+
+    async function openInClaude() {
+      const btn = document.getElementById('claude-btn');
+      const label = document.getElementById('btn-label');
+      const hint = document.getElementById('copy-hint');
+
+      try {
+        await navigator.clipboard.writeText(CONTEXT_PROMPT);
+        btn.classList.add('copied');
+        label.textContent = 'Copied!';
+        hint.classList.add('visible');
+      } catch (e) {
+        // Clipboard blocked (e.g. non-HTTPS) — open Claude anyway
+      }
+
+      window.open('https://claude.ai', '_blank');
+
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        label.textContent = 'Discuss in Claude.ai';
+        hint.classList.remove('visible');
+      }, 4000);
+    }
+  </script>
+
+</body>
+</html>

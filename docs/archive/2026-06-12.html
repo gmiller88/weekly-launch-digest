@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weekly Launch Digest — June 12, 2026</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      min-height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: #f0f2f5;
+      color: #1a1a2e;
+    }
+
+    #page { max-width: 740px; margin: 0 auto; padding: 0 16px 48px; }
+
+    /* Header */
+    #digest-header {
+      background: #1a1a2e;
+      margin: 0 -16px;
+      padding: 24px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    #digest-header h1 {
+      font-size: 19px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.3px;
+    }
+
+    #digest-header .date { font-size: 12px; color: #8888aa; margin-top: 3px; }
+
+    #digest-header .archive-link {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #8899cc;
+      text-decoration: none;
+    }
+
+    #digest-header .archive-link:hover { color: #aabbee; }
+
+    /* Open in Claude button */
+    #claude-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #0055cc;
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      padding: 9px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+      flex-shrink: 0;
+    }
+
+    #claude-btn:hover { background: #0044aa; }
+    #claude-btn.copied { background: #007744; cursor: default; }
+    #claude-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    #copy-hint {
+      font-size: 11px;
+      color: #8888aa;
+      margin-top: 6px;
+      text-align: right;
+      display: none;
+    }
+
+    #copy-hint.visible { display: block; }
+
+    /* Sections */
+    .digest-section {
+      background: white;
+      border-radius: 8px;
+      padding: 24px 28px;
+      margin-top: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-label::before {
+      content: "";
+      display: inline-block;
+      width: 3px;
+      height: 14px;
+      border-radius: 2px;
+    }
+
+    .section-label.funding { color: #0055cc; }
+    .section-label.funding::before { background: #0055cc; }
+    .section-label.launches { color: #007744; }
+    .section-label.launches::before { background: #007744; }
+
+    /* ── Digest content (targets from digest/render.py) ───────────── */
+
+    .d-item {
+      margin-bottom: 32px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .d-item:last-child, .d-fund-item:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .d-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .d-title {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 600;
+      color: #1a1a2e;
+      flex: 1;
+      line-height: 1.4;
+    }
+
+    .d-score, .d-score-na {
+      display: inline-block;
+      color: white;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 700;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .d-score { background: #0055cc; font-size: 13px; }
+    .d-score-na { background: #777; font-size: 12px; }
+
+    .d-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .d-th {
+      padding: 6px 12px 6px 0;
+      vertical-align: top;
+      white-space: nowrap;
+      color: #555;
+      font-weight: 600;
+      width: 130px;
+      text-align: left;
+    }
+
+    .d-td { padding: 6px 0; color: #333; }
+    .d-table tr:nth-child(even) { background: #fafafa; }
+
+    .d-steal {
+      margin-top: 14px;
+      padding: 12px 14px;
+      background: #f2f7f4;
+      border-left: 3px solid #007744;
+      border-radius: 4px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #234;
+    }
+
+    .d-steal-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.1px;
+      text-transform: uppercase;
+      color: #007744;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .d-evidence {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #888;
+      line-height: 1.55;
+    }
+
+    .d-note {
+      font-style: italic;
+      color: #555;
+      margin-bottom: 20px;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .d-pattern {
+      margin-bottom: 24px;
+      padding: 14px 16px;
+      background: #f7f7fb;
+      border-left: 3px solid #0055cc;
+      border-radius: 4px;
+      font-size: 14px;
+      line-height: 1.7;
+      color: #333;
+    }
+
+    .d-pattern-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.1px;
+      text-transform: uppercase;
+      color: #0055cc;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .d-links { margin-top: 10px; font-size: 13px; }
+    .d-link { color: #0055cc; text-decoration: none; }
+    .d-link:hover { text-decoration: underline; }
+    .d-empty { color: #666; font-size: 14px; }
+
+    .d-fund-item {
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .d-fund-title {
+      margin: 0 0 8px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #1a1a2e;
+    }
+
+    .d-fund-body {
+      margin: 0 0 10px;
+      line-height: 1.65;
+      color: #333;
+      font-size: 14px;
+    }
+
+    /* Archive index */
+    .archive-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .archive-row:last-child { border-bottom: none; }
+    .archive-row a { color: #0055cc; text-decoration: none; font-weight: 600; font-size: 15px; }
+    .archive-row a:hover { text-decoration: underline; }
+    .archive-row .meta { font-size: 12px; color: #888; }
+
+    @media (max-width: 560px) {
+      .d-table, .d-table tbody, .d-table tr, .d-th, .d-td { display: block; width: auto; }
+      .d-th { padding-bottom: 0; }
+      .d-td { padding-top: 2px; padding-bottom: 10px; }
+      .d-table tr:nth-child(even) { background: transparent; }
+    }
+  </style>
+</head>
+<body>
+  <div id="page">
+
+    <div id="digest-header">
+      <div>
+        <h1>Weekly Launch Digest</h1>
+        <div class="date">Week ending June 12, 2026</div>
+        <a class="archive-link" href="../archive.html">Browse past weeks &rarr;</a>
+      </div>
+      <div>
+        <button id="claude-btn" onclick="openInClaude()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <span id="btn-label">Discuss in Claude.ai</span>
+        </button>
+        <div id="copy-hint">Digest copied &mdash; just paste into Claude.ai</div>
+      </div>
+    </div>
+
+    <div class="digest-section">
+      <div class="section-label launches">Top B2B Product Launches</div>
+      <p style="font-style: italic; color: #555; margin-bottom: 24px; font-size: 14px;"><strong>Analyst Note:</strong> This was a week almost entirely consumed by one story — Apple's WWDC 2026 — which dominated tech media oxygen from Monday onward. Outside of that singular event, the B2B software launch landscape was notably thin: the remaining articles skew heavily toward ad-tech press releases, funding news, and startup competition deadlines rather than substantive product launches with dedicated GTM campaigns. Genuine B2B software launches with meaningful execution evidence are scarce, so this list reflects that reality — only two entries clear the bar with confidence, with a third included as a qualified honorable mention.</p>
+
+<div class="launch-item" style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #eee;">
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
+    <h3 style="margin: 0; font-size: 17px; font-weight: 600; color: #1a1a2e; flex: 1;">Apple — Apple Intelligence & Siri Overhaul (WWDC 2026)</h3>
+    <span style="display: inline-block; background: #0055cc; color: white; padding: 3px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-left: 12px; white-space: nowrap;">8/10</span>
+  </div>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.65;">
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600; width: 130px;">Company</td>
+      <td style="padding: 6px 0; color: #333;">Apple is a global consumer and enterprise hardware/software platform with deep penetration in enterprise mobility, developer tooling, and productivity software. While primarily consumer-facing, iOS and macOS are foundational platforms for millions of B2B workflows, and Apple Intelligence has direct implications for enterprise productivity, MDM, and developer ecosystems.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">The Launch</td>
+      <td style="padding: 6px 0; color: #333;">A sweeping overhaul of Apple Intelligence across iOS 27, macOS, iPadOS, and visionOS — including a rebuilt Siri with standalone app, chat history, and file uploads; AI-powered photo editing (Reframe, Extend, upgraded Cleanup); system-wide AI dictation; and natural-language-driven Shortcuts. The core value proposition: AI woven natively into the OS layer, eliminating the need for third-party AI tools for a broad class of enterprise productivity tasks.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Product Fit</td>
+      <td style="padding: 6px 0; color: #333;">This is squarely in Apple's wheelhouse: deep OS integration, privacy-first framing, and a polished UI that competitors visibly struggle to match. The Shortcuts-via-natural-language feature is a direct enterprise productivity play, lowering the barrier to automation for non-technical business users. The stretch, as ever, is closing the gap between announcement and actual delivery — launching Siri's new capabilities as a "beta with waitlist" is a notable caveat that tempers some of the momentum.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Launch Playbook</td>
+      <td style="padding: 6px 0; color: #333;">Executed via the WWDC keynote — Apple's highest-profile annual developer stage, live-streamed globally and treated as a tier-1 press event by TechCrunch, CNBC, Forbes, Business Insider, Fox Business, and 9to5Mac simultaneously. Pre-event leaks (Bloomberg's Mark Gurman) were allowed to build anticipation without Apple officially confirming, a deliberate slow-burn embargo strategy. The keynote itself served as the product demo, press release, and developer briefing in one. Notably, this was Tim Cook's final WWDC as CEO, adding a narrative layer that amplified coverage beyond the product itself.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Messaging</td>
+      <td style="padding: 6px 0; color: #555;">Apple leaned hard on "Apple Intelligence" as the unifying brand umbrella — their deliberate reframe of AI as something distinctly Apple-flavored (private, integrated, empowering). They emphasized that AI is now "threaded through every product" rather than bolted on, which implicitly positions competitors' AI as external and fragmented. What they left unsaid: any acknowledgment of being late to the AI race, or the fact that Siri's new capabilities are launching behind a waitlist rather than at full general availability on day one.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Why This Rating</td>
+      <td style="padding: 6px 0; color: #333;">An 8 rather than a 9 or 10 because the B2B-specific activation is largely absent — there's no enterprise customer co-announcement, no dedicated developer GTM motion beyond the standard WWDC session track, and the beta/waitlist caveat undermines the "it's here now" narrative. The launch execution at the keynote level is genuinely excellent and the media saturation is total, but Apple is playing catchup in a category it should own, and the phased rollout limits the "this changes everything today" energy that a top-tier score requires.</td>
+    </tr>
+  </table>
+
+  <div style="margin-top: 10px;">
+    <a href="https://techcrunch.com/2026/06/09/wwdc-2026-everything-announced-on-siri-ai-os-27-apple-intelligence-and-more/" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+  </div>
+</div>
+
+<div class="launch-item" style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #eee;">
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
+    <h3 style="margin: 0; font-size: 17px; font-weight: 600; color: #1a1a2e; flex: 1;">LinkedIn — BrandWorks</h3>
+    <span style="display: inline-block; background: #0055cc; color: white; padding: 3px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-left: 12px; white-space: nowrap;">6/10</span>
+  </div>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.65;">
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600; width: 130px;">Company</td>
+      <td style="padding: 6px 0; color: #333;">LinkedIn, owned by Microsoft, is the dominant B2B social and professional network with over 1 billion members. Its advertising platform is a core revenue engine, targeting business decision-makers at scale — making it a direct competitor to programmatic B2B ad networks and agency-led media buying operations.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">The Launch</td>
+      <td style="padding: 6px 0; color: #333;">BrandWorks is a newly assembled in-house team of marketing experts at LinkedIn designed to deliver managed, higher-performing ad campaign execution for B2B advertisers. The headline metric: an annualized run rate target of $100M next fiscal year. The value proposition is a concierge-style campaign service layer on top of LinkedIn's existing ad inventory, with marquee customers including SAP already signed on.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Product Fit</td>
+      <td style="padding: 6px 0; color: #333;">A natural extension of LinkedIn's existing Campaign Manager and B2B advertising suite — this is essentially LinkedIn moving upmarket into managed services, a model that Google, Meta, and Amazon Ads have all pursued with dedicated "agency within the platform" teams. It plays directly to LinkedIn's core strength (unmatched B2B audience targeting) while addressing a known friction point: many mid-market B2B advertisers lack the internal expertise to maximize LinkedIn's more sophisticated ad formats.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Launch Playbook</td>
+      <td style="padding: 6px 0; color: #333;">Reuters secured what appears to be an exclusive or near-exclusive on the announcement, citing a source familiar with the matter — a classic controlled leak to a wire service, designed to generate credible third-party validation without a formal press release. The SAP customer name-drop alongside the launch adds immediate enterprise credibility. No conference stage, no product demo video, no community moment — this was purely a press-relations-driven announcement with a single outlet carrying the story.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Messaging</td>
+      <td style="padding: 6px 0; color: #333;">LinkedIn positioned BrandWorks around performance outcomes ("higher-performing ad campaigns") rather than the service model itself, which is smart — advertisers care about results, not org charts. The $100M ARR target being shared externally is an unusual move; it signals confidence and creates a tangible benchmark, but also sets a public accountability bar. What's conspicuously absent: any AI or automation angle, which feels like a missed opportunity given the current narrative environment.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Why This Rating</td>
+      <td style="padding: 6px 0; color: #333;">A 6 reflects a competent but deliberately low-key launch for what is actually a meaningful strategic move. The Reuters exclusive and SAP anchor show intentional GTM thinking, but the absence of any visual assets, demo content, or broader media amplification means it won't build significant market momentum on its own. The $100M revenue target hint is a bold transparency choice that generates interest, but the overall launch surface area is narrow for a product that represents a real category expansion for LinkedIn's ad business.</td>
+    </tr>
+  </table>
+
+  <div style="margin-top: 10px;">
+    <a href="https://www.reuters.com/business/media-telecom/linkedin-launches-new-effort-push-capture-business-advertisers-2026-06-10/" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+  </div>
+</div>
+
+<div class="launch-item" style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #eee;">
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
+    <h3 style="margin: 0; font-size: 17px; font-weight: 600; color: #1a1a2e; flex: 1;">TripleLift — TL Direct</h3>
+    <span style="display: inline-block; background: #0055cc; color: white; padding: 3px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-left: 12px; white-space: nowrap;">5/10</span>
+  </div>
+
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.65;">
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600; width: 130px;">Company</td>
+      <td style="padding: 6px 0; color: #333;">TripleLift is a growth-stage ad-tech company positioning itself as a "Creative SSP" — a supply-side platform with a proprietary agentic intelligence layer (TL Spark) designed to serve buyers and sellers across web, mobile, and CTV. It competes in the programmatic advertising infrastructure space against the likes of Magnite, PubMatic, and Index Exchange.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">The Launch</td>
+      <td style="padding: 6px 0; color: #333;">TL Direct is a self-serve platform enabling buyers and sellers to build and activate curated media deals across web, mobile, and CTV — reportedly in minutes rather than weeks. It reached general availability after a closed beta with agencies, publishers, and brands. The core promise: dramatically compressing deal activation time while giving both sides of the transaction unified control and access to TripleLift's behavioral data and creative capabilities.</td>
+    </tr>
+    <tr>
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Product Fit</td>
+      <td style="padding: 6px 0; color: #333;">TL Direct is a logical GA milestone for TripleLift's self-serve ambitions and directly complements their TL Spark agentic intelligence layer — together they form a coherent "build deals fast, optimize them automatically" stack. The multi-channel scope (web + mobile + CTV in one interface) is the genuine differentiation play, as most SSPs require separate workflows per environment. This is an authentic product-market fit story for the programmatic ad-tech B2B buyer.</td>
+    </tr>
+    <tr style="background: #fafafa;">
+      <td style="padding: 6px 12px 6px 0; vertical-align: top; white-space: nowrap; color: #555; font-weight: 600;">Launch Playbook</td>
+      <td style="padding: 6px 0; color: #333;">Announced via PR Newswire press release — a workmanlike distribution
+    </div>
+
+    <div class="digest-section">
+      <div class="section-label funding">VC Funding Announcements</div>
+      <div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">Digital Asset</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">Digital Asset raised $355 million in a funding round led by Andreessen Horowitz through its a16z crypto fund. Additional participants include major financial institutions such as HSBC, BNP Paribas, ABN Amro, Broadridge, SoFi Technologies, Tradeweb, S&P Global, the Abu Dhabi Investment Authority, Citadel Securities, and Coinbase Ventures, among others. No new valuation was disclosed. The company did not specify use of funds in the available summary, though the round's scale and institutional breadth suggest expansion of its blockchain infrastructure and financial markets technology.</p>
+  <a href="https://www.fintechfutures.com/venture-capital-funding/digital-asset-355m-funding-round" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+</div>
+
+<div class="funding-item" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
+  <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #1a1a2e;">PointFive</h3>
+  <p style="margin: 0 0 10px; line-height: 1.65; color: #333; font-size: 14px;">PointFive, an Israeli-founded company that helps enterprises reduce cloud and AI infrastructure costs, raised $60 million in a Series B round led by Accel. Index Ventures also participated, alongside Salesforce Ventures, Entrée Capital, Perpetual Growth, Vesey Ventures, and Sheva Ventures. No new valuation figure was disclosed. The company said the funds will be used for product development, go-to-market expansion, and growth in the United States, following a reported sixfold increase in annual recurring revenue between 2024 and 2025.</p>
+  <a href="https://www.ynetnews.com/business/article/s1r1ocnbme" style="color: #0055cc; font-size: 13px; text-decoration: none;">Read more →</a>
+    </div>
+
+  </div>
+
+  <script>
+    const CONTEXT_PROMPT = `This is the archived Weekly Launch Digest for the week ending June 12, 2026.`;
+
+    async function openInClaude() {
+      const btn = document.getElementById('claude-btn');
+      const label = document.getElementById('btn-label');
+      const hint = document.getElementById('copy-hint');
+
+      try {
+        await navigator.clipboard.writeText(CONTEXT_PROMPT);
+        btn.classList.add('copied');
+        label.textContent = 'Copied!';
+        hint.classList.add('visible');
+      } catch (e) {
+        // Clipboard blocked (e.g. non-HTTPS) — open Claude anyway
+      }
+
+      window.open('https://claude.ai', '_blank');
+
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        label.textContent = 'Discuss in Claude.ai';
+        hint.classList.remove('visible');
+      }, 4000);
+    }
+  </script>
+
+</body>
+</html>

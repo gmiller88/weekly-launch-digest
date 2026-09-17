@@ -1,0 +1,592 @@
+{
+  "weeks": [
+    {
+      "date": "2026-06-05",
+      "launches": [
+        {
+          "company": "Microsoft",
+          "launch_name": "Unmetered Agentic AI Models & Majorana 2 (Build 2026)",
+          "score": 7.0,
+          "assessable": true
+        },
+        {
+          "company": "Ramp",
+          "launch_name": "AI Agent Corporate Card & Token Spend Management",
+          "score": 6.0,
+          "assessable": true
+        },
+        {
+          "company": "DoorDash Ads",
+          "launch_name": "Global Commerce Media Platform",
+          "score": 5.0,
+          "assessable": true
+        }
+      ],
+      "funding": [
+        {
+          "company": "IMPULSE SPACE"
+        },
+        {
+          "company": "DRIVENETS"
+        },
+        {
+          "company": "SUPABASE"
+        },
+        {
+          "company": "NSAVE"
+        }
+      ]
+    },
+    {
+      "date": "2026-06-12",
+      "launches": [
+        {
+          "company": "Apple",
+          "launch_name": "Apple Intelligence & Siri Overhaul (WWDC 2026)",
+          "score": 8.0,
+          "assessable": true
+        },
+        {
+          "company": "LinkedIn",
+          "launch_name": "BrandWorks",
+          "score": 6.0,
+          "assessable": true
+        },
+        {
+          "company": "TripleLift",
+          "launch_name": "TL Direct",
+          "score": 5.0,
+          "assessable": true
+        }
+      ],
+      "funding": [
+        {
+          "company": "Digital Asset"
+        },
+        {
+          "company": "PointFive"
+        }
+      ]
+    },
+    {
+      "date": "2026-06-19",
+      "launches": [
+        {
+          "company": "Veeva Systems",
+          "launch_name": "Agentic Commercial",
+          "score": 6.0,
+          "assessable": true
+        },
+        {
+          "company": "LinkedIn",
+          "launch_name": "Creator Marketplace & BrandWorks",
+          "score": 5.0,
+          "assessable": true
+        }
+      ],
+      "funding": [
+        {
+          "company": "Ent"
+        },
+        {
+          "company": "Verse"
+        },
+        {
+          "company": "Probably"
+        },
+        {
+          "company": "Andera"
+        },
+        {
+          "company": "Sarvam"
+        },
+        {
+          "company": "Serval"
+        }
+      ]
+    },
+    {
+      "date": "2026-06-26",
+      "launches": [
+        {
+          "company": "PitchBook",
+          "launch_name": "Microsoft 365 Copilot & Excel AI Integration",
+          "score": 6.0,
+          "assessable": true
+        },
+        {
+          "company": "RedotPay",
+          "launch_name": "RedotPay Connect B2B Merchant Gateway",
+          "score": 5.0,
+          "assessable": true
+        },
+        {
+          "company": "Mira Commerce",
+          "launch_name": "ForgeB2B Website Accelerator",
+          "score": 4.0,
+          "assessable": true
+        }
+      ],
+      "funding": [
+        {
+          "company": "Sail Research"
+        },
+        {
+          "company": "Mirendil"
+        },
+        {
+          "company": "Fomo"
+        },
+        {
+          "company": "Smart Bricks"
+        }
+      ]
+    },
+    {
+      "date": "2026-07-03",
+      "launches": [
+        {
+          "company": "Microsoft",
+          "launch_name": "AI Adoption Firm (Commercial AI Services Spinout)",
+          "score": 7.0,
+          "assessable": true
+        },
+        {
+          "company": "Mobigital",
+          "launch_name": "AI Virtual Livestream for B2B Commerce",
+          "score": 5.0,
+          "assessable": true
+        },
+        {
+          "company": "Wolters Kluwer",
+          "launch_name": "CCH Axcess Expert AI Document Scanning",
+          "score": 4.0,
+          "assessable": true
+        }
+      ],
+      "funding": [
+        {
+          "company": "Together AI"
+        }
+      ]
+    },
+    {
+      "date": "2026-07-10",
+      "launches": [
+        {
+          "company": "OpenAI",
+          "launch_name": "GPT-5.6 Model Family (Sol, Terra, Luna) + Codex Desktop Integration",
+          "score": 7.0,
+          "assessable": true
+        },
+        {
+          "company": "Visa",
+          "launch_name": "Visa Threat Intelligence Platform (VTIP)",
+          "score": 6.0,
+          "assessable": true
+        },
+        {
+          "company": "ZoomInfo",
+          "launch_name": "Self-Service Audience Building (GTM Platform Expansion)",
+          "score": 4.0,
+          "assessable": true
+        }
+      ],
+      "funding": [
+        {
+          "company": "Clair Health"
+        }
+      ]
+    },
+    {
+      "date": "2026-07-17",
+      "launches": [
+        {
+          "company": "Vibes",
+          "launch_name": "RCS Studio Professional",
+          "score": 7.0,
+          "assessable": true
+        },
+        {
+          "company": "Esri",
+          "launch_name": "ArcGIS Velocity for ArcGIS Enterprise",
+          "score": 6.0,
+          "assessable": true
+        },
+        {
+          "company": "Beehiiv",
+          "launch_name": "Community + AI Copilot",
+          "score": 6.0,
+          "assessable": true
+        }
+      ],
+      "funding": [
+        {
+          "company": "Chai Discovery"
+        },
+        {
+          "company": "Oak"
+        },
+        {
+          "company": "TerraFirma"
+        },
+        {
+          "company": "Neo Security"
+        },
+        {
+          "company": "Valarian"
+        },
+        {
+          "company": "QIZ Security"
+        },
+        {
+          "company": "Feathery"
+        },
+        {
+          "company": "Axle Energy"
+        }
+      ]
+    },
+    {
+      "date": "2026-07-24",
+      "launches": [
+        {
+          "company": "OpenAI",
+          "launch_name": "Presence (AI Agent Orchestration Platform)",
+          "score": 7.0,
+          "assessable": true
+        },
+        {
+          "company": "Commercetools",
+          "launch_name": "Core Commerce & Product Catalog Modular Offerings",
+          "score": 5.0,
+          "assessable": true
+        }
+      ],
+      "funding": [
+        {
+          "company": "Atoms"
+        },
+        {
+          "company": "Arrakis"
+        },
+        {
+          "company": "Anduril"
+        },
+        {
+          "company": "Chai Discovery"
+        }
+      ]
+    },
+    {
+      "date": "2026-07-31",
+      "launches": [
+        {
+          "company": "6sense",
+          "launch_name": "AI-Recommended Leads",
+          "score": 6.0,
+          "assessable": true
+        },
+        {
+          "company": "LinkedIn",
+          "launch_name": "Creator Marketplace & BrandWorks",
+          "score": 6.0,
+          "assessable": true
+        },
+        {
+          "company": "Solitics",
+          "launch_name": "Saai (Agentic AI for Retail Banking)",
+          "score": 4.0,
+          "assessable": true
+        }
+      ],
+      "funding": [
+        {
+          "company": "Atoms"
+        },
+        {
+          "company": "Genius AI"
+        },
+        {
+          "company": "Harvey"
+        },
+        {
+          "company": "Ellis AI"
+        },
+        {
+          "company": "Onyx Security"
+        },
+        {
+          "company": "DataBahn"
+        },
+        {
+          "company": "Paper"
+        },
+        {
+          "company": "Etched"
+        },
+        {
+          "company": "Together AI"
+        },
+        {
+          "company": "Chai Discovery"
+        }
+      ]
+    },
+    {
+      "date": "2026-08-07",
+      "launches": [
+        {
+          "company": "June AI",
+          "launch_name": "Agentic Enterprise Software Implementation Platform",
+          "score": 8.5,
+          "assessable": true
+        },
+        {
+          "company": "HG Insights",
+          "launch_name": "Revenue Growth Intelligence (RGI) Platform",
+          "score": 6.0,
+          "assessable": true
+        },
+        {
+          "company": "Zoom",
+          "launch_name": "Revenue Accelerator AI Sales Coaching Expansion & Consumption Pricing Restructure",
+          "score": 5.5,
+          "assessable": true
+        }
+      ],
+      "funding": [
+        {
+          "company": "Valar Atomics"
+        },
+        {
+          "company": "Mariana Minerals"
+        },
+        {
+          "company": "K2 Space"
+        },
+        {
+          "company": "Chai Discovery"
+        },
+        {
+          "company": "Arrakis"
+        },
+        {
+          "company": "Spur"
+        }
+      ]
+    },
+    {
+      "date": "2026-08-14",
+      "launches": [
+        {
+          "company": "Skan AI",
+          "launch_name": "Enterprise AI Platform",
+          "score": 5.0,
+          "assessable": true
+        },
+        {
+          "company": "SlashExperts",
+          "launch_name": "Carly AI Agent",
+          "score": 4.0,
+          "assessable": true
+        }
+      ],
+      "funding": [
+        {
+          "company": "Source Foundry"
+        },
+        {
+          "company": "Valar Atomics"
+        },
+        {
+          "company": "Base Power"
+        },
+        {
+          "company": "Lovable"
+        },
+        {
+          "company": "HappyRobot"
+        },
+        {
+          "company": "Corma"
+        }
+      ]
+    },
+    {
+      "date": "2026-08-21",
+      "launches": [
+        {
+          "company": "Unilog",
+          "launch_name": "CX1 Sigma",
+          "score": 6.0,
+          "assessable": true
+        },
+        {
+          "company": "InsideTracker",
+          "launch_name": "Terra Blood Data Connector",
+          "score": 5.0,
+          "assessable": true
+        },
+        {
+          "company": "Nexsys",
+          "launch_name": "NexInsure Platform Suite",
+          "score": 4.0,
+          "assessable": true
+        }
+      ],
+      "funding": [
+        {
+          "company": "Etched"
+        },
+        {
+          "company": "Twin1 AI"
+        },
+        {
+          "company": "Higgsfield"
+        },
+        {
+          "company": "Blueprint"
+        },
+        {
+          "company": "Cascade (AEC AI)"
+        },
+        {
+          "company": "Engine Biosciences"
+        }
+      ]
+    },
+    {
+      "date": "2026-08-28",
+      "launches": [
+        {
+          "company": "Salesforce + Anthropic",
+          "launch_name": "Claudeforce",
+          "score": 8.5,
+          "assessable": true
+        },
+        {
+          "company": "Shopify",
+          "launch_name": "Flow 3.0 + Native B2B Checkout",
+          "score": 7.5,
+          "assessable": true
+        },
+        {
+          "company": "6sense",
+          "launch_name": "AI Agent Data Integration (Intent-to-Agent Routing)",
+          "score": 5.5,
+          "assessable": true
+        }
+      ],
+      "funding": [
+        {
+          "company": "Instinct"
+        },
+        {
+          "company": "General Intuition"
+        },
+        {
+          "company": "Space (file management startup)"
+        },
+        {
+          "company": "Uplift"
+        }
+      ]
+    },
+    {
+      "date": "2026-09-04",
+      "launches": [
+        {
+          "company": "NVIDIA + CrowdStrike",
+          "launch_name": "SafeMind Agentic Cyber Defense Platform",
+          "score": 7.0,
+          "assessable": true
+        },
+        {
+          "company": "Walnut",
+          "launch_name": "Enterprise AI Agent Platform (AI Mode + Walnut Xpert)",
+          "score": 6.0,
+          "assessable": true
+        },
+        {
+          "company": "Dreamdata",
+          "launch_name": "Dreamdata AI (Analytics Agent, MCP Server + Data Warehouse)",
+          "score": 6.0,
+          "assessable": true
+        }
+      ],
+      "funding": [
+        {
+          "company": "Town"
+        },
+        {
+          "company": "Instinct"
+        },
+        {
+          "company": "Easy Aerial"
+        },
+        {
+          "company": "Vals AI"
+        },
+        {
+          "company": "Metal"
+        },
+        {
+          "company": "Félix"
+        },
+        {
+          "company": "Profound"
+        },
+        {
+          "company": "Atira"
+        }
+      ]
+    },
+    {
+      "date": "2026-09-11",
+      "launches": [
+        {
+          "company": "Cymphony",
+          "launch_name": "Stealth-to-Launch with $30M to Secure AI Agent Access to Enterprise Data",
+          "score": 8.0,
+          "assessable": true
+        },
+        {
+          "company": "Articulate",
+          "launch_name": "Nova, Frontline, and Enterprise Integration Suite",
+          "score": 7.0,
+          "assessable": true
+        },
+        {
+          "company": "Parafin × Tekion",
+          "launch_name": "Pay Over Time B2B BNPL for Automotive Dealerships",
+          "score": 6.0,
+          "assessable": true
+        }
+      ],
+      "funding": [
+        {
+          "company": "Cognition"
+        },
+        {
+          "company": "Harvey"
+        },
+        {
+          "company": "Gimlet Labs"
+        },
+        {
+          "company": "Clay"
+        },
+        {
+          "company": "Lightfield"
+        },
+        {
+          "company": "Atorie"
+        },
+        {
+          "company": "Flagler Health"
+        }
+      ]
+    }
+  ]
+}

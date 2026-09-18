@@ -239,6 +239,24 @@ def _capture(tavily: TavilyClient, req: dict) -> dict:
         except Exception as e:
             print(f"    baseline extract failed: {e}", file=sys.stderr)
 
+    # First-party sweep. The product and pricing pages are the highest-value
+    # diff targets ("which 'coming soon' items shipped"), and a generic search
+    # often buries them under partner blogs — so search the company's own
+    # domain directly, derived from the anchor URL.
+    host = urllib.parse.urlparse(req.get("url") or "").netloc.lower()
+    host = re.sub(r"^www\.", "", host)
+    if host:
+        for query in (req["launch_name"], f"{req['launch_name']} pricing"):
+            try:
+                for r in tavily.search(
+                    query=query, search_depth="advanced", max_results=4,
+                    include_domains=[host], include_raw_content="markdown",
+                ).get("results", []):
+                    add(r.get("url"), r.get("title"),
+                        r.get("raw_content") or r.get("content"))
+            except Exception as e:
+                print(f"    first-party search failed ({query!r}): {e}", file=sys.stderr)
+
     for template in _BASELINE_QUERIES:
         query = template.format(company=req["company"], launch=req["launch_name"])
         try:

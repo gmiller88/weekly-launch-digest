@@ -9,6 +9,7 @@ from tavily import TavilyClient
 
 from . import history as hist
 from . import llm
+from . import tracking
 from .email_sender import send_digest_email
 from .fundraising import build_funding_digest
 from .launches import build_launches_digest
@@ -65,6 +66,14 @@ def main() -> None:
         print(f"WARNING: Funding digest failed: {e}", file=sys.stderr)
         funding = {"entries": []}
 
+    print("Running post-launch tracking checkpoints...")
+    try:
+        tracking_updates = tracking.run_checkpoints(tavily, claude)
+        print(f"  {len(tracking_updates)} checkpoint(s) this week")
+    except Exception as e:
+        print(f"WARNING: Tracking failed: {e}", file=sys.stderr)
+        tracking_updates = []
+
     if not launches["entries"] and not funding["entries"]:
         print("ERROR: Both sections are empty — not publishing.", file=sys.stderr)
         sys.exit(1)
@@ -72,7 +81,8 @@ def main() -> None:
     if args.dump:
         with open(args.dump, "w", encoding="utf-8") as f:
             json.dump(
-                {"date": date_iso, "launches": launches, "funding": funding},
+                {"date": date_iso, "launches": launches, "funding": funding,
+                 "tracking": tracking_updates},
                 f,
                 indent=2,
                 ensure_ascii=False,
@@ -80,7 +90,10 @@ def main() -> None:
         print(f"Wrote raw data to {args.dump}")
 
     print("Writing digest page...")
-    write_digest_page(funding, launches, date_label=date_label, date_iso=date_iso)
+    write_digest_page(
+        funding, launches, date_label=date_label, date_iso=date_iso,
+        tracking_updates=tracking_updates,
+    )
 
     print("Recording history...")
     hist.save_history(hist.record_week(history, date_iso, launches, funding))
@@ -97,6 +110,8 @@ def main() -> None:
             launches=launches,
             site_url=os.getenv("SITE_URL"),
             date_label=date_label,
+            date_iso=date_iso,
+            tracking_updates=tracking_updates,
         )
 
     scored = [e for e in launches["entries"] if e.get("score") is not None]

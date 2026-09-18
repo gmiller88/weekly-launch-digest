@@ -122,6 +122,47 @@ _STYLE = """\
     .section-label.funding::before { background: #0055cc; }
     .section-label.launches { color: #007744; }
     .section-label.launches::before { background: #007744; }
+    .section-label.tracking { color: #b8860b; }
+    .section-label.tracking::before { background: #b8860b; }
+
+    /* Post-launch tracking */
+    .d-trk-item {
+      margin-bottom: 18px;
+      padding: 14px 16px;
+      background: #fbfaf6;
+      border-left: 3px solid #b8860b;
+      border-radius: 4px;
+    }
+
+    .d-trk-head { font-size: 15px; font-weight: 600; color: #1a1a2e; margin: 0 0 6px; }
+    .d-trk-meta { font-size: 11px; color: #887; margin-bottom: 8px; }
+    .d-trk-headline { font-size: 14px; line-height: 1.65; color: #333; margin: 0; }
+
+    .d-trk-badge {
+      display: inline-block;
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      background: #777;
+    }
+
+    .d-trk-accelerating { background: #007744; }
+    .d-trk-sustained { background: #0055cc; }
+    .d-trk-decaying { background: #b8860b; }
+    .d-trk-abandoned { background: #c0392b; }
+    .d-trk-unclear { background: #777; }
+
+    .d-trk-block {
+      margin-bottom: 34px;
+      padding-bottom: 30px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .d-trk-block:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
 
     /* ── Digest content (targets from digest/render.py) ───────────── */
 
@@ -310,6 +351,7 @@ STYLE_PLACEHOLDER  </style>
         <h1>Weekly Launch Digest</h1>
         <div class="date">Week ending DATE_PLACEHOLDER</div>
         <a class="archive-link" href="ARCHIVE_HREF_PLACEHOLDER">Browse past weeks &rarr;</a>
+        <a class="archive-link" href="TRACKING_HREF_PLACEHOLDER" style="margin-left: 14px;">Tracked launches &rarr;</a>
       </div>
       <div>
         <button id="claude-btn" onclick="openInClaude()">
@@ -322,6 +364,7 @@ STYLE_PLACEHOLDER  </style>
       </div>
     </div>
 
+TRACKING_SECTION_PLACEHOLDER
     <div class="digest-section">
       <div class="section-label launches">Top B2B Product Launches</div>
       LAUNCHES_CONTENT_PLACEHOLDER
@@ -399,12 +442,24 @@ def _build_page(
     date_label: str,
     context_prompt: str,
     archive_href: str,
+    tracking_href: str = "tracking.html",
+    tracking_html: str = "",
 ) -> str:
+    section = ""
+    if tracking_html:
+        section = (
+            '    <div class="digest-section">\n'
+            '      <div class="section-label tracking">Post-Launch Tracking</div>\n'
+            f"      {tracking_html}\n"
+            "    </div>\n"
+        )
     return (
         _PAGE
         .replace("STYLE_PLACEHOLDER", _STYLE)
         .replace("DATE_PLACEHOLDER", date_label)
         .replace("ARCHIVE_HREF_PLACEHOLDER", archive_href)
+        .replace("TRACKING_HREF_PLACEHOLDER", tracking_href)
+        .replace("TRACKING_SECTION_PLACEHOLDER", section)
         .replace("FUNDING_CONTENT_PLACEHOLDER", funding_html)
         .replace("LAUNCHES_CONTENT_PLACEHOLDER", launches_html)
         .replace("CONTEXT_PROMPT_PLACEHOLDER", _escape_for_js_template(context_prompt))
@@ -466,26 +521,70 @@ def write_archive_index(output_dir: str = "docs") -> int:
     return len(paths)
 
 
+def write_tracking_page(
+    updates: list[dict],
+    date_label: str,
+    output_dir: str = "docs",
+) -> None:
+    """Full dossiers for this week's checkpoints, linked from the email summary."""
+    if updates:
+        blocks = "\n".join(
+            f'<div class="d-trk-block">{render.render_tracking_full(u)}</div>'
+            for u in updates
+        )
+    else:
+        blocks = (
+            '<p class="d-empty">No tracking checkpoints were due this week. '
+            'Press "Track this launch" in any digest email to start following one.</p>'
+        )
+
+    page = (
+        _PAGE
+        .replace("STYLE_PLACEHOLDER", _STYLE)
+        .replace("DATE_PLACEHOLDER", date_label)
+        .replace("ARCHIVE_HREF_PLACEHOLDER", "archive.html")
+        .replace("TRACKING_HREF_PLACEHOLDER", "tracking.html")
+        .replace("TRACKING_SECTION_PLACEHOLDER", "")
+        .replace(
+            '<div class="section-label launches">Top B2B Product Launches</div>',
+            '<div class="section-label tracking">Post-Launch Tracking</div>',
+        )
+        .replace("LAUNCHES_CONTENT_PLACEHOLDER", blocks)
+        .replace(
+            '<div class="digest-section">\n      <div class="section-label funding">'
+            "VC Funding Announcements</div>\n      FUNDING_CONTENT_PLACEHOLDER\n"
+            "    </div>",
+            "",
+        )
+        .replace("FUNDING_CONTENT_PLACEHOLDER", "")
+        .replace("CONTEXT_PROMPT_PLACEHOLDER", "")
+    )
+    _write(os.path.join(output_dir, "tracking.html"), page)
+
+
 def write_digest_page(
     funding: dict,
     launches: dict,
     date_label: str | None = None,
     date_iso: str | None = None,
     output_dir: str = "docs",
+    tracking_updates: list[dict] | None = None,
 ) -> None:
     """Write this week's page, its permanent dated copy, and the archive index."""
     date_label = date_label or datetime.now().strftime("%B %d, %Y")
     date_iso = date_iso or datetime.now().strftime("%Y-%m-%d")
+    tracking_updates = tracking_updates or []
 
     funding_html = render.render_funding(funding)
     launches_html = render.render_launches(launches)
+    tracking_html = render.render_tracking_summary(tracking_updates)
 
     context_prompt = (
         f"You are a helpful assistant with deep expertise in B2B product marketing "
         f"and the startup ecosystem. I've just read my Weekly Launch Digest for the "
         f"week ending {date_label} and want to dig deeper on some of what I read. "
         f"Here's the full digest:\n\n"
-        f"{render.plain_text(funding, launches)}\n\n"
+        f"{render.plain_text(funding, launches, tracking_updates)}\n\n"
         f"I'll ask you follow-up questions."
     )
 
@@ -493,7 +592,8 @@ def write_digest_page(
     _write(
         os.path.join(output_dir, "archive", f"{date_iso}.html"),
         _build_page(
-            funding_html, launches_html, date_label, context_prompt, "../archive.html"
+            funding_html, launches_html, date_label, context_prompt,
+            "../archive.html", "../tracking.html", tracking_html,
         ),
     )
 
@@ -501,9 +601,12 @@ def write_digest_page(
     _write(
         os.path.join(output_dir, "index.html"),
         _build_page(
-            funding_html, launches_html, date_label, context_prompt, "archive.html"
+            funding_html, launches_html, date_label, context_prompt,
+            "archive.html", "tracking.html", tracking_html,
         ),
     )
+
+    write_tracking_page(tracking_updates, date_label, output_dir)
 
     total = write_archive_index(output_dir)
     print(f"  wrote index.html + archive/{date_iso}.html ({total} editions archived)")

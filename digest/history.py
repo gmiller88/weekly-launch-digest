@@ -47,6 +47,8 @@ def record_week(history: dict, date: str, launches: dict, funding: dict) -> dict
                 "launch_name": e.get("launch_name", ""),
                 "score": e.get("score"),
                 "assessable": e.get("assessable", True),
+                # Kept so a launch can be tracked retroactively later.
+                "url": (e.get("sources") or [{}])[0].get("url", ""),
             }
             for e in launches.get("entries", [])
         ],

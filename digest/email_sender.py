@@ -14,13 +14,33 @@ def send_digest_email(
     launches: dict,
     site_url: str | None = None,
     date_label: str | None = None,
+    date_iso: str | None = None,
+    tracking_updates: list[dict] | None = None,
 ) -> None:
     today = date_label or datetime.now().strftime("%B %d, %Y")
     subject = f"Weekly Launch Digest — {today}"
 
     # Inline styles throughout: Gmail strips <style> blocks.
     funding_html = render.render_funding(funding, email=True)
-    launches_html = render.render_launches(launches, email=True)
+    launches_html = render.render_launches(launches, email=True, digest_date=date_iso)
+
+    tracking_html = ""
+    if tracking_updates:
+        summary = render.render_tracking_summary(tracking_updates, email=True)
+        link = (
+            f'<a href="{site_url.rstrip("/")}/tracking.html" style="color: #b8860b; '
+            f'font-size: 12px; font-weight: 600; text-decoration: none;">'
+            f"See the full dossiers &rarr;</a>"
+            if site_url else ""
+        )
+        tracking_html = f"""
+      <div style="margin-bottom: 40px;">
+        <div style="margin-bottom: 20px;">
+          <h2 style="margin: 0; font-size: 13px; font-weight: 700; color: #b8860b; text-transform: uppercase; letter-spacing: 1px; border-left: 4px solid #b8860b; padding-left: 10px;">Post-Launch Tracking</h2>
+        </div>
+        {summary}
+        <div style="margin-top: 4px;">{link}</div>
+      </div>"""
 
     html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -41,7 +61,7 @@ def send_digest_email(
 
     <!-- Body -->
     <div style="background: white; border-radius: 0 0 8px 8px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-
+{tracking_html}
       <!-- Launches section -->
       <div style="margin-bottom: 40px;">
         <div style="margin-bottom: 20px;">
@@ -73,7 +93,9 @@ def send_digest_email(
     msg["Subject"] = subject
     msg["From"] = gmail_user
     msg["To"] = recipient
-    msg.attach(MIMEText(render.plain_text(funding, launches), "plain"))
+    msg.attach(
+        MIMEText(render.plain_text(funding, launches, tracking_updates), "plain")
+    )
     msg.attach(MIMEText(html, "html"))
 
     with smtplib.SMTP("smtp.gmail.com", 587) as server:

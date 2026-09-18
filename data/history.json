@@ -587,6 +587,52 @@
           "company": "Flagler Health"
         }
       ]
+    },
+    {
+      "date": "2026-09-18",
+      "launches": [
+        {
+          "company": "Salesforce",
+          "launch_name": "AIforce",
+          "score": 7,
+          "assessable": true
+        },
+        {
+          "company": "Noetive",
+          "launch_name": "Noetive (self-improving AI for factories and logistics)",
+          "score": 7,
+          "assessable": true
+        },
+        {
+          "company": "Anthropic",
+          "launch_name": "One Claude — Claude Docs, Claude Slides, and the absorption of Cowork and Design",
+          "score": 7,
+          "assessable": true
+        },
+        {
+          "company": "Docket",
+          "launch_name": "Docket Showroom",
+          "score": 6,
+          "assessable": true
+        },
+        {
+          "company": "MacPaw",
+          "launch_name": "Leebry",
+          "score": 6,
+          "assessable": true
+        }
+      ],
+      "funding": [
+        {
+          "company": "Luzern Risk"
+        },
+        {
+          "company": "Thatch"
+        },
+        {
+          "company": "River AI"
+        }
+      ]
     }
   ]
 }

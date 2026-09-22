@@ -194,6 +194,111 @@ _BASELINE_QUERIES = [
 MIN_BASELINE_CHARS = 500
 MAX_BASELINE_PAGES = 6
 
+# What we keep from a page. Storing a typed snapshot rather than raw page text
+# keeps third-party prose out of this public repo, and makes the later
+# comparison sharper: we diff the fields that carry meaning ("coming soon" ->
+# "available now", a price appearing) instead of reflowed paragraphs.
+_SNAPSHOT_SCHEMA = {
+    "type": "object",
+    "additionalProperties": False,
+    "required": [
+        "hero_headline", "hero_subhead", "positioning_claims", "modules",
+        "available_now", "coming_soon", "pricing", "named_customers",
+        "events_mentioned", "primary_cta", "notes",
+    ],
+    "properties": {
+        "hero_headline": {"type": "string"},
+        "hero_subhead": {"type": "string"},
+        "positioning_claims": {
+            "type": "array", "items": {"type": "string"},
+            "description": "Headline claims and proof points, each one short.",
+        },
+        "modules": {
+            "type": "array", "items": {"type": "string"},
+            "description": "Named products, features, skills, SKUs or tiers.",
+        },
+        "available_now": {
+            "type": "array", "items": {"type": "string"},
+            "description": "Items presented as shipped, GA or generally available.",
+        },
+        "coming_soon": {
+            "type": "array", "items": {"type": "string"},
+            "description": (
+                "Items marked coming soon, preview, beta, waitlist, or promised "
+                "for a future date. This is the highest-value field: the later "
+                "comparison turns it into what actually shipped."
+            ),
+        },
+        "pricing": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "additionalProperties": False,
+                "required": ["item", "price"],
+                "properties": {
+                    "item": {"type": "string"},
+                    "price": {
+                        "type": "string",
+                        "description": "Verbatim, including 'contact us' or 'free'.",
+                    },
+                },
+            },
+        },
+        "named_customers": {"type": "array", "items": {"type": "string"}},
+        "events_mentioned": {"type": "array", "items": {"type": "string"}},
+        "primary_cta": {"type": "string"},
+        "notes": {
+            "type": "string",
+            "description": "Anything else materially useful for a later comparison.",
+        },
+    },
+}
+
+
+def _snapshot(
+    tavily: TavilyClient,
+    claude: anthropic.Anthropic,
+    urls: list[str],
+    label: str,
+) -> dict:
+    """Fetch these pages and reduce them to a typed snapshot."""
+    texts = []
+    for url in urls:
+        try:
+            for r in tavily.extract(urls=[url], format="markdown").get("results", []):
+                raw = (r.get("raw_content") or "").strip()
+                if len(raw) >= MIN_BASELINE_CHARS:
+                    texts.append(f"=== {url}\n\n{raw[:12000]}")
+        except Exception as e:
+            print(f"    extract failed for {url}: {e}", file=sys.stderr)
+
+    if not texts:
+        return {}
+
+    prompt = f"""Extract a structured snapshot of this product's public positioning, exactly as these pages present it today.
+
+This snapshot will be compared against another one captured weeks later, to establish what the company actually shipped versus what it merely promised. So be precise and literal:
+
+- Record what the pages SAY, not what you know from elsewhere.
+- Quote names and prices verbatim. If pricing says "contact us", record that.
+- `coming_soon` is the most important field. Capture anything framed as coming soon, in preview, in beta, waitlisted, or promised for a named future quarter or date — with enough detail to recognise the same item later.
+- `available_now` should only hold things the pages present as actually shipped.
+- Keep list entries short and comparable. Prefer "Financial Services Cloud skills" over a full sentence.
+- If a field genuinely has nothing, return an empty list or empty string rather than inventing content.
+
+PAGES ({label}):
+
+{chr(10).join(texts)}
+"""
+    try:
+        return structured(
+            claude, prompt, _SNAPSHOT_SCHEMA,
+            effort="medium", max_tokens=8000, label=f"snapshot {label}",
+        )
+    except Exception as e:
+        print(f"    snapshot failed: {e}", file=sys.stderr)
+        return {}
+
 
 def _company_tokens(company: str) -> list[str]:
     """Domain-ish tokens for a company name, to spot first-party pages.
@@ -216,11 +321,12 @@ def _first_party(url: str, tokens: list[str]) -> bool:
     return any(t in host for t in tokens)
 
 
-def _capture(tavily: TavilyClient, req: dict) -> dict:
-    """Snapshot the artefacts we'll later diff against.
+def _capture(tavily: TavilyClient, claude: anthropic.Anthropic, req: dict) -> dict:
+    """Snapshot the artefacts we'll later compare against.
 
-    Ranked so the company's own pages come first: a diff against a third-party
-    SEO blog tells us nothing about what the company actually shipped.
+    Ranked so the company's own pages come first: a comparison against a
+    third-party SEO blog tells us nothing about what the company actually
+    shipped.
     """
     pages: list[dict] = []
     seen: set[str] = set()
@@ -274,7 +380,19 @@ def _capture(tavily: TavilyClient, req: dict) -> dict:
     first_party = sum(1 for p in kept if _first_party(p["url"], tokens))
     print(f"    kept {len(kept)}/{len(pages)} page(s), {first_party} first-party")
 
-    return {"captured": date.today().isoformat(), "pages": kept}
+    urls = [p["url"] for p in kept]
+    snapshot = _snapshot(
+        tavily, claude, urls, f"{req['company']} {req['launch_name']} at tracking start"
+    )
+    if snapshot:
+        print(
+            f"    snapshot: {len(snapshot.get('coming_soon', []))} coming-soon, "
+            f"{len(snapshot.get('available_now', []))} available, "
+            f"{len(snapshot.get('pricing', []))} price point(s)"
+        )
+
+    # Only the snapshot and the URLs are kept — no raw third-party page text.
+    return {"captured": date.today().isoformat(), "urls": urls, "snapshot": snapshot}
 
 
 # ── Checkpoint research ──────────────────────────────────────────────────
@@ -292,8 +410,13 @@ _CHECKPOINT_QUERIES = [
 ]
 
 
-def _research(tavily: TavilyClient, state: dict, since: str) -> tuple[list[dict], list[dict]]:
-    """New signals since `since`, plus a re-fetch of the baseline pages to diff."""
+def _research(
+    tavily: TavilyClient,
+    claude: anthropic.Anthropic,
+    state: dict,
+    since: str,
+) -> tuple[list[dict], dict, dict]:
+    """New signals since `since`, plus baseline and current snapshots to compare."""
     company, launch = state["company"], state["launch_name"]
     signals: list[dict] = []
     seen: set[str] = set()
@@ -320,20 +443,13 @@ def _research(tavily: TavilyClient, state: dict, since: str) -> tuple[list[dict]
                 })
 
     baseline = _read_json(os.path.join(TRACKING_DIR, state["slug"], "baseline.json")) or {}
-    current: list[dict] = []
-    for page in baseline.get("pages", [])[:4]:
-        try:
-            for r in tavily.extract(urls=[page["url"]], format="markdown").get("results", []):
-                current.append({
-                    "url": page["url"],
-                    "title": page["title"],
-                    "baseline_text": page["text"][:6000],
-                    "current_text": (r.get("raw_content") or "")[:6000],
-                })
-        except Exception as e:
-            print(f"    re-extract failed for {page['url']}: {e}", file=sys.stderr)
+    urls = baseline.get("urls") or []
+    current = (
+        _snapshot(tavily, claude, urls, f"{state['company']} {state['launch_name']} now")
+        if urls else {}
+    )
 
-    return signals, current
+    return signals, baseline.get("snapshot") or {}, current
 
 
 _CHECKPOINT_SCHEMA = {
@@ -420,7 +536,8 @@ def _analyze(
     state: dict,
     week: int,
     signals: list[dict],
-    diffs: list[dict],
+    baseline_snapshot: dict,
+    current_snapshot: dict,
     prior: list[dict],
 ) -> dict:
     signal_block = "\n\n".join(
@@ -428,12 +545,37 @@ def _analyze(
         for s in signals
     ) or "(No new signals retrieved.)"
 
-    diff_block = "\n\n".join(
-        f"=== PAGE: {d['title']}\nURL: {d['url']}\n"
-        f"--- AT TRACKING START ---\n{d['baseline_text']}\n"
-        f"--- NOW ---\n{d['current_text']}"
-        for d in diffs
-    ) or "(No baseline pages available to compare.)"
+    captured = state.get("baseline_captured", "")
+    if baseline_snapshot and current_snapshot:
+        diff_block = (
+            f"AT TRACKING START (captured {captured or 'unknown date'}):\n"
+            + json.dumps(baseline_snapshot, indent=2, ensure_ascii=False)
+            + "\n\nNOW:\n"
+            + json.dumps(current_snapshot, indent=2, ensure_ascii=False)
+        )
+    else:
+        diff_block = "(No usable snapshot comparison available.)"
+
+    # Retroactively-tracked launches get their baseline long after announcement,
+    # so the comparison window can be much shorter than the checkpoint age.
+    window_note = ""
+    try:
+        anchor_d = datetime.strptime(state["anchor_date"], "%Y-%m-%d").date()
+        captured_d = datetime.strptime(captured, "%Y-%m-%d").date()
+        lag = (captured_d - anchor_d).days
+        if lag > 7:
+            window_note = (
+                f"\nIMPORTANT — the baseline was captured {lag} days AFTER this launch "
+                f"was first profiled, because tracking started retroactively. So the "
+                f"snapshot comparison only covers from {captured} onward, not from the "
+                f"launch. Anything that shipped between {state['anchor_date']} and "
+                f"{captured} will already appear in the 'AT TRACKING START' side and "
+                f"will NOT show up as a change. Lean on the signals for that earlier "
+                f"period, and do not read an unchanged snapshot as evidence of a "
+                f"stalled campaign.\n"
+            )
+    except (ValueError, KeyError):
+        pass
 
     prior_block = "\n\n".join(
         f"Week {p['week']} ({p['date']}) — momentum: {p['data'].get('momentum')}\n"
@@ -468,15 +610,16 @@ PRIOR CHECKPOINTS:
 {score_instruction}
 
 HOW TO READ THE EVIDENCE:
-- The page comparison below is the highest-value input. It shows the same pages as captured when tracking began and as they are now. Use it to establish what actually shipped versus what was merely promised — "coming soon" items going GA, pricing appearing or changing, modules added or quietly removed, hero messaging rewritten.
+- The snapshot comparison below is the highest-value input. Both objects were extracted from the same company-owned pages using the same schema — one when tracking began, one now. Compare them field by field. An item moving from `coming_soon` to `available_now` is a shipped promise. An item still in `coming_soon` after {week} weeks is a slipped one. Something that vanished from both was dropped quietly. Watch `pricing` for figures replacing "contact us", `modules` for additions and removals, and `hero_headline` / `positioning_claims` for repositioning.
+- Snapshot extraction is imperfect. If a field is empty in one snapshot but populated in the other, consider that it may be an extraction miss rather than a real change, and say so rather than over-reading it.
 - The signals are search results from after the anchor date. Weigh company-owned sources for intent and third-party sources for traction.
 - Do not treat absence of evidence as evidence of absence. If you cannot find webinars, say you could not find them — do not assert there were none. Retrieval is imperfect and a confident negative is worse than an honest gap.
 - Distinguish genuine momentum from noise. A reposted press release is not momentum. A named customer telling their own story, a conference session with recorded content, a partner building on the product, an analyst note, a pricing page that now lists what was previously "contact us" — those are momentum.
 
 Write in plain, direct language. No filler that editorially validates the company. If the campaign went quiet, say so plainly — a launch that faded after a strong announcement is one of the most instructive cases this reader can study.
 
-PAGE COMPARISON (tracking start vs now):
-{diff_block}
+SNAPSHOT COMPARISON (same pages, same schema, tracking start vs now):
+{window_note}{diff_block}
 
 SIGNALS SINCE {state['anchor_date']}:
 {signal_block}
@@ -508,10 +651,15 @@ def _due_checkpoint(state: dict, today: date) -> int | None:
     return None
 
 
-def _adopt(tavily: TavilyClient, req: dict, today: date) -> dict:
+def _adopt(
+    tavily: TavilyClient,
+    claude: anthropic.Anthropic,
+    req: dict,
+    today: date,
+) -> dict:
     """First time we see a tracking request: capture the baseline."""
     print(f"  adopting #{req['issue']}: {req['company']} — {req['launch_name']}")
-    baseline = _capture(tavily, req)
+    baseline = _capture(tavily, claude, req)
     _write_json(os.path.join(TRACKING_DIR, req["slug"], "baseline.json"), baseline)
 
     state = dict(req)
@@ -531,8 +679,9 @@ def _adopt(tavily: TavilyClient, req: dict, today: date) -> dict:
 
     _comment(
         req["issue"],
-        f"**Tracking started.** Captured {len(baseline['pages'])} baseline page(s) "
-        f"to diff against later.\n\nAnchor date (first appeared in the digest): "
+        f"**Tracking started.** Snapshotted {len(baseline.get('urls', []))} "
+        f"company page(s) to compare against later.\n\n"
+        f"Anchor date (first appeared in the digest): "
         f"`{anchor}`\n\nCheckpoints due:\n{schedule}\n\nEach checkpoint will be "
         f"posted here and summarised in that week's digest email.",
     )
@@ -559,7 +708,7 @@ def run_checkpoints(
     for req in active:
         state = _read_json(_state_path(req["slug"]))
         if not state:
-            state = _adopt(tavily, req, today)
+            state = _adopt(tavily, claude, req, today)
 
         week = _due_checkpoint(state, today)
         if week is None:
@@ -579,11 +728,16 @@ def run_checkpoints(
                     prior.append({"week": w, "date": data.get("run_date", ""), "data": data})
                     since = data.get("run_date") or since
 
-        signals, diffs = _research(tavily, state, since)
-        print(f"    {len(signals)} signal(s), {len(diffs)} page comparison(s)")
+        signals, base_snap, cur_snap = _research(tavily, claude, state, since)
+        print(
+            f"    {len(signals)} signal(s), snapshot comparison: "
+            f"{'yes' if base_snap and cur_snap else 'unavailable'}"
+        )
 
         try:
-            result = _analyze(claude, state, week, signals, diffs, prior)
+            result = _analyze(
+                claude, state, week, signals, base_snap, cur_snap, prior
+            )
         except Exception as e:
             print(f"    checkpoint failed: {e}", file=sys.stderr)
             continue

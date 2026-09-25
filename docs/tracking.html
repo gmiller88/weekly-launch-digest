@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weekly Launch Digest — September 25, 2026</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      min-height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: #f0f2f5;
+      color: #1a1a2e;
+    }
+
+    #page { max-width: 740px; margin: 0 auto; padding: 0 16px 48px; }
+
+    /* Header */
+    #digest-header {
+      background: #1a1a2e;
+      margin: 0 -16px;
+      padding: 24px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    #digest-header h1 {
+      font-size: 19px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.3px;
+    }
+
+    #digest-header .date { font-size: 12px; color: #8888aa; margin-top: 3px; }
+
+    #digest-header .archive-link {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #8899cc;
+      text-decoration: none;
+    }
+
+    #digest-header .archive-link:hover { color: #aabbee; }
+
+    /* Open in Claude button */
+    #claude-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #0055cc;
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      padding: 9px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+      flex-shrink: 0;
+    }
+
+    #claude-btn:hover { background: #0044aa; }
+    #claude-btn.copied { background: #007744; cursor: default; }
+    #claude-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    #copy-hint {
+      font-size: 11px;
+      color: #8888aa;
+      margin-top: 6px;
+      text-align: right;
+      display: none;
+    }
+
+    #copy-hint.visible { display: block; }
+
+    /* Sections */
+    .digest-section {
+      background: white;
+      border-radius: 8px;
+      padding: 24px 28px;
+      margin-top: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-label::before {
+      content: "";
+      display: inline-block;
+      width: 3px;
+      height: 14px;
+      border-radius: 2px;
+    }
+
+    .section-label.funding { color: #0055cc; }
+    .section-label.funding::before { background: #0055cc; }
+    .section-label.launches { color: #007744; }
+    .section-label.launches::before { background: #007744; }
+    .section-label.tracking { color: #b8860b; }
+    .section-label.tracking::before { background: #b8860b; }
+
+    /* Post-launch tracking */
+    .d-trk-item {
+      margin-bottom: 18px;
+      padding: 14px 16px;
+      background: #fbfaf6;
+      border-left: 3px solid #b8860b;
+      border-radius: 4px;
+    }
+
+    .d-trk-head { font-size: 15px; font-weight: 600; color: #1a1a2e; margin: 0 0 6px; }
+    .d-trk-meta { font-size: 11px; color: #887; margin-bottom: 8px; }
+    .d-trk-headline { font-size: 14px; line-height: 1.65; color: #333; margin: 0; }
+
+    .d-trk-badge {
+      display: inline-block;
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      background: #777;
+    }
+
+    .d-trk-accelerating { background: #007744; }
+    .d-trk-sustained { background: #0055cc; }
+    .d-trk-decaying { background: #b8860b; }
+    .d-trk-abandoned { background: #c0392b; }
+    .d-trk-unclear { background: #777; }
+
+    .d-trk-block {
+      margin-bottom: 34px;
+      padding-bottom: 30px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .d-trk-block:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+
+    /* ── Digest content (targets from digest/render.py) ───────────── */
+
+    .d-item {
+      margin-bottom: 32px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .d-item:last-child, .d-fund-item:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .d-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .d-title {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 600;
+      color: #1a1a2e;
+      flex: 1;
+      line-height: 1.4;
+    }
+
+    .d-score, .d-score-na {
+      display: inline-block;
+      color: white;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 700;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .d-score { background: #0055cc; font-size: 13px; }
+    .d-score-na { background: #777; font-size: 12px; }
+
+    .d-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .d-th {
+      padding: 6px 12px 6px 0;
+      vertical-align: top;
+      white-space: nowrap;
+      color: #555;
+      font-weight: 600;
+      width: 130px;
+      text-align: left;
+    }
+
+    .d-td { padding: 6px 0; color: #333; }
+    .d-table tr:nth-child(even) { background: #fafafa; }
+
+    .d-steal {
+      margin-top: 14px;
+      padding: 12px 14px;
+      background: #f2f7f4;
+      border-left: 3px solid #007744;
+      border-radius: 4px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #234;
+    }
+
+    .d-steal-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.1px;
+      text-transform: uppercase;
+      color: #007744;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .d-evidence {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #888;
+      line-height: 1.55;
+    }
+
+    .d-note {
+      font-style: italic;
+      color: #555;
+      margin-bottom: 20px;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .d-pattern {
+      margin-bottom: 24px;
+      padding: 14px 16px;
+      background: #f7f7fb;
+      border-left: 3px solid #0055cc;
+      border-radius: 4px;
+      font-size: 14px;
+      line-height: 1.7;
+      color: #333;
+    }
+
+    .d-pattern-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.1px;
+      text-transform: uppercase;
+      color: #0055cc;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .d-links { margin-top: 10px; font-size: 13px; }
+    .d-link { color: #0055cc; text-decoration: none; }
+    .d-link:hover { text-decoration: underline; }
+    .d-empty { color: #666; font-size: 14px; }
+
+    .d-fund-item {
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .d-fund-title {
+      margin: 0 0 8px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #1a1a2e;
+    }
+
+    .d-fund-body {
+      margin: 0 0 10px;
+      line-height: 1.65;
+      color: #333;
+      font-size: 14px;
+    }
+
+    /* Archive index */
+    .archive-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .archive-row:last-child { border-bottom: none; }
+    .archive-row a { color: #0055cc; text-decoration: none; font-weight: 600; font-size: 15px; }
+    .archive-row a:hover { text-decoration: underline; }
+    .archive-row .meta { font-size: 12px; color: #888; }
+
+    @media (max-width: 560px) {
+      .d-table, .d-table tbody, .d-table tr, .d-th, .d-td { display: block; width: auto; }
+      .d-th { padding-bottom: 0; }
+      .d-td { padding-top: 2px; padding-bottom: 10px; }
+      .d-table tr:nth-child(even) { background: transparent; }
+    }
+  </style>
+</head>
+<body>
+  <div id="page">
+
+    <div id="digest-header">
+      <div>
+        <h1>Weekly Launch Digest</h1>
+        <div class="date">Week ending September 25, 2026</div>
+        <a class="archive-link" href="archive.html">Browse past weeks &rarr;</a>
+        <a class="archive-link" href="tracking.html" style="margin-left: 14px;">Tracked launches &rarr;</a>
+      </div>
+      <div>
+        <button id="claude-btn" onclick="openInClaude()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <span id="btn-label">Discuss in Claude.ai</span>
+        </button>
+        <div id="copy-hint">Digest copied &mdash; just paste into Claude.ai</div>
+      </div>
+    </div>
+
+
+    <div class="digest-section">
+      <div class="section-label tracking">Post-Launch Tracking</div>
+      <div class="d-trk-block"><div class="d-trk-item"><div class="d-trk-head">Salesforce + Anthropic &mdash; Claudeforce &nbsp;<span class="d-trk-badge d-trk-sustained">sustained</span></div><div class="d-trk-meta">Week 4 &middot; first profiled 2026-08-28</div><p class="d-trk-headline">Salesforce shipped the Salesforce in Claude open beta on schedule at Dreamforce (Sept 15) and folded Claudeforce into a bigger &quot;AIforce&quot; umbrella with Dario Amodei on the main keynote stage — but the Claudeforce page itself still reads as if the product is in pilot with a beta only &quot;planned,&quot; and there is still no pricing and no third-party named customer.</p></div>
+<table class="d-table"><tr><td class="d-th">Shipped vs promised</td><td class="d-td">The single biggest promise — &quot;open beta in September 2026&quot; — appears to have been kept. Third-party coverage (Coursiv, updated Sept 15) reports the open beta went live at Dreamforce and that Salesforce in Claude is available on all paid Claude plans. That is a shipped commitment, and it landed inside the promised month. The problem is that salesforce.com/claudeforce does not say so. Both snapshots carry the identical hero subhead: &quot;available today for pilot customers and is planned for open beta in September 2026,&quot; and &quot;Salesforce in Claude — available today for select pilot customers&quot; is still the top line under available_now. The primary CTA did change — from &quot;Get updates (join waitlist for Salesforce in Claude beta)&quot; to a split &quot;read Anthropic&#x27;s announcement / request access to Enterprise Frontier Safeguards / connect with Salesforce&quot; — which is consistent with retiring the waitlist once beta opened, but it replaced a single clear conversion path with three vaguer ones and no &quot;install the plugin&quot; route. Pricing is still an empty array in both snapshots, four weeks after a LinkedIn commenter on Salesforce&#x27;s own launch post asked the two questions every buyer has: what is the cost per user, and do you need Agentforce licenses. Coursiv reports the answer is genuinely messy — Salesforce bills headless API consumption, Claude inference is contracted separately with Anthropic, no combined contract — which explains the silence but does not excuse it. The coming_soon list shrank sharply: Commerce, Revenue, Field Service, Tableau, MuleSoft, Informatica, Data 360, Industries all disappeared without reappearing in available_now. Headless 360 did move cleanly from coming_soon into available_now, and Agentforce Voice was added to available_now. I would not over-read the vanished roadmap tiles as cancellations — the Marketing skills entry in the current snapshot is visibly truncated mid-sentence (&quot;Ground every campaign with...&quot;), which suggests the roadmap section is a carousel or accordion that the extractor only partially captured. But the net effect for a visitor is a shorter, vaguer forward roadmap than existed at baseline. Enterprise Frontier Safeguards is unchanged at &quot;phased rollout beginning later fall 2026&quot; — not yet due, not yet slipped.</td></tr><tr><td class="d-th">Channel activity</td><td class="d-td">Dreamforce 2026 (Sept 15–17, San Francisco) was the entire post-launch motion, and it was substantial. Amodei appeared on the main keynote stage alongside Benioff, plus the CEOs of NVIDIA and Siemens; Benioff called the combined effort &quot;the most exciting thing we&#x27;ve ever done&quot; and described Anthropic as &quot;the number one AI in the world&quot; (R&amp;D World, Sept 15). Salesforce used the event to launch AIforce as the umbrella layer, with Claudeforce positioned as one surface on it alongside Slackforce, Agentforce Coworker and Koa. Salesforce News published a Dreamforce roundup on X (&quot;Everything from Dreamforce 2026: Claudeforce, Koa, and...&quot;). Stack Intelligence reported that Salesforce ran live Claudeforce experiences and workshops on the show floor. Owned social was active across LinkedIn (a four-point &quot;better together&quot; post from the main Salesforce handle), X, and multiple Instagram Reels explaining the 37 skills. A webinar titled &quot;How Anthropic Runs Sales Performance with Claudeforce&quot; is listed on the page in both snapshots — I could not confirm whether it has actually run or whether a recording exists, and it is the single highest-value asset on that list, since it is the only thing that would turn the &quot;Anthropic is our customer&quot; claim into a watchable proof point. Partner and SI content filled fast: Cybage, Codleo, CodeSierra, Stack Intelligence and Trigger Hours all published explainers within days, and a PwC-linked LinkedIn post references a webinar series built around ClaudeForce. That ecosystem content is real distribution, but it is uncontrolled — CodeSierra&#x27;s guide, which ranks, asserts the default reasoning model is &quot;Claude 3.5 Sonnet,&quot; which is wrong. When you don&#x27;t publish your own technical FAQ fast enough, partners will write it for you and get it wrong.</td></tr><tr><td class="d-th">Third-party validation</td><td class="d-td">Strongest proof is financial, not customer. The announcement ran on the Q2 FY27 earnings call; CRM closed up roughly 22.6% at $252.05 the next day, one of the strongest sessions in company history (cmm360). Agentforce + Data 360 combined ARR hit ~$3.9B, up more than 210%, with 3.2B agentic work units executed across Agentforce and Slack, up 97% QoQ. Benioff added a usable internal proof point at Dreamforce: the Hunter sales agent generated $500M in pipeline last quarter. Ecosystem coverage has been continuous rather than a single spike — Salesforce Ben has run Claudeforce as a recurring beat, including the sceptical &quot;Is Agentforce Still Relevant Now That Salesforce Has Claudeforce?&quot; and &quot;What Does the Future Hold for Anthropic and Salesforce?&quot; Cybage&#x27;s analysis is the sharpest and least flattering: it reads the press release as Salesforce &quot;accepting a future where they become a headless system of workflows and records,&quot; and notes the awkwardness of a CRM vendor conceding that &quot;where sellers work&quot; is moving to Anthropic. Counterweights are visible: a circulating Gartner prediction that 70% of enterprises will abandon agentic AI by 2028, and Salesforce Ben&#x27;s report of a global service disruption during Dreamforce itself. The material gap is customer validation. named_customers is identical in both snapshots — Salesforce and Anthropic, nobody else. Four weeks after launch and two weeks after open beta, there is not one third-party enterprise telling its own Claudeforce story that I could find.</td></tr><tr><td class="d-th">Messaging evolution</td><td class="d-td">Two changes worth noting. First, hard numbers got promoted from buried blog copy into headline positioning: &quot;ROI in about eight months, 53% employee adoption, 29% CSAT improvement, 29% reduction in operational costs&quot; and the Agentforce Service stats (38% CSAT, 30% lower support costs, 38% more cases solved) were in the baseline only as notes, and now sit in positioning_claims. That is the right direction — moving from vision language to quantified outcomes — though the numbers are Agentforce-derived, not Claudeforce-derived, which a sharp buyer will notice. Second, the claims got tighter and slightly less expansive: &quot;Software is a system that powers every interface; the UI is the AI&quot; compressed to just &quot;The UI is the AI&quot;; &quot;Salesforce is Anthropic&#x27;s preferred CRM; Slack its preferred multiplayer work platform&quot; lost the Slack half; and &quot;works with existing Salesforce permissions and business rules&quot; quietly dropped &quot;and business rules.&quot; Modules picked up &quot;MCP servers, APIs, and CLI tools&quot; — the AIforce harness vocabulary from Dreamforce starting to leak onto the Claudeforce page — while Koa dropped out of the module list into related-coverage mentions, i.e. it became its own thing. The bigger repositioning happened off-page: Claudeforce is now a component of AIforce rather than the top-level story. That is strategically coherent but it means the Claudeforce sub-brand, which had enormous earned-media equity three weeks earlier, is now a child node whose landing page has not been rewritten to reflect its new place.</td></tr><tr><td class="d-th">Hiring signal</td><td class="d-td">Thin and mostly indirect. The one concrete find is Anthropic hiring a Salesforce Developer at $270–345K to build and run its own Salesforce platform for quote-to-cash — core sales automation, CPQ, order and contract management — with the posting explicitly stating the team is &quot;AI-first&quot; and expects Claude to be used to write and ship the code. That is a useful reinforcement of the mutual-adoption claim: Anthropic is genuinely staffing Salesforce as its revenue system of record, not just name-dropping it. I could not find dedicated Claudeforce product marketing, partner marketing, or field enablement roles at either company, and absence of retrieval here is not evidence they don&#x27;t exist — Salesforce&#x27;s careers site is large and these roles are rarely titled after a sub-brand.</td></tr></table>
+<div class="d-steal"><span class="d-steal-label">Steal This &mdash; Sustained GTM</span>When you launch a sub-brand three weeks before your flagship conference and then absorb it into a bigger umbrella at that conference, someone has to own rewriting the sub-brand&#x27;s landing page the same week. Salesforce shipped the beta on time — the hardest part — and then left the page saying the beta was &quot;planned.&quot; A visitor arriving today from any of the dozens of ecosystem explainers still ranking for &quot;Claudeforce&quot; reads a pilot-stage pitch, loses the waitlist CTA that used to give them something to do, and finds no pricing and no way to install. The portable lesson: the week-one landing page is a launch asset, but by week four it is a demand-capture asset, and it needs different copy — shipped status, a self-serve path, and an answer to the packaging question your own LinkedIn commenters are asking in public. The avoidable failure here is not silence; it is a loud campaign pointing at a page frozen in its announcement-day state.</div>
+<div class="d-evidence"><strong>What would make this strong by week 12:</strong> Too early to score, and in this case a four-week read is especially misleading because Dreamforce was always on the calendar — a launch timed three weeks ahead of your own flagship event gets a second wave by design, not by sustained effort. What we can say now: the hardest promise (September open beta) appears kept, executive air cover was maximal, and third-party coverage has been continuous rather than a single news spike. What is missing is exactly the stuff that separates a sustained campaign from a well-amplified announcement. By week 12 I would want to see: (1) at least two non-Salesforce, non-Anthropic enterprises telling their own Claudeforce story with named people and a number attached — the customer-zero framing has carried this for a full quarter and is now overdue for external proof; (2) a real answer on pricing and packaging, even if it is just &quot;here is how headless consumption is metered and here is whether you need Agentforce licenses&quot; — the two questions the audience asked on day one are still unanswered on the page; (3) the Sales-only skill library extended into at least one more persona, since Service, Marketing, Commerce, Revenue and Field Service were all promised &quot;in the next quarter&quot; and several have already quietly thinned out of the roadmap section; (4) the Claudeforce page rewritten to post-beta status with a self-serve install path; (5) evidence the Anthropic sales-performance webinar actually ran and exists as a recorded, gated asset; and (6) Enterprise Frontier Safeguards entering its phased rollout on the stated fall timeline. Hit four of those six and this is an 8-plus at week 12. Keep shipping product while the owned GTM surface stays frozen and it lands closer to a 6, because the launch will have been carried entirely by earned media and an events calendar.</div>
+<div class="d-links"><a href="https://coursiv.io/blog/claudeforce" class="d-link">Claudeforce: Salesforce CRM Inside Claude — with Sept 15 open beta update &rarr;</a> &nbsp;·&nbsp; <a href="https://www.salesforceben.com/salesforce-and-anthropic-announce-claudeforce-in-q2-27-earnings" class="d-link">Salesforce and Anthropic Announce &#x27;Claudeforce&#x27; in Q2 &#x27;27 Earnings — Salesforce Ben &rarr;</a> &nbsp;·&nbsp; <a href="https://www.salesforceben.com/the-6-biggest-takeaways-from-the-dreamforce-26-main-keynote" class="d-link">The 6 Biggest Takeaways from the Dreamforce &#x27;26 Main Keynote — Salesforce Ben &rarr;</a> &nbsp;·&nbsp; <a href="https://www.rdworldonline.com/salesforces-dreamforce-keynote-highlights-anthropic-nvidia-and-siemens-together-as-digital-rd-spending-surges" class="d-link">Salesforce&#x27;s Dreamforce keynote highlights Anthropic, NVIDIA and Siemens — R&amp;D World &rarr;</a></div></div>
+    </div>
+
+    
+
+  </div>
+
+  <script>
+    const CONTEXT_PROMPT = ``;
+
+    async function openInClaude() {
+      const btn = document.getElementById('claude-btn');
+      const label = document.getElementById('btn-label');
+      const hint = document.getElementById('copy-hint');
+
+      try {
+        await navigator.clipboard.writeText(CONTEXT_PROMPT);
+        btn.classList.add('copied');
+        label.textContent = 'Copied!';
+        hint.classList.add('visible');
+      } catch (e) {
+        // Clipboard blocked (e.g. non-HTTPS) — open Claude anyway
+      }
+
+      window.open('https://claude.ai', '_blank');
+
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        label.textContent = 'Discuss in Claude.ai';
+        hint.classList.remove('visible');
+      }, 4000);
+    }
+  </script>
+
+</body>
+</html>

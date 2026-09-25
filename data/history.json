@@ -633,6 +633,54 @@
           "company": "River AI"
         }
       ]
+    },
+    {
+      "date": "2026-09-25",
+      "launches": [
+        {
+          "company": "Aikido Security",
+          "launch_name": "Altar-1 (open-weight cybersecurity AI model)",
+          "score": 8,
+          "assessable": true,
+          "url": "https://www.reuters.com/legal/litigation/belgiums-aikido-launches-cybersecurity-ai-model-demand-local-tools-grows-2026-09-21/"
+        },
+        {
+          "company": "Phave",
+          "launch_name": "Phave",
+          "score": 7,
+          "assessable": true,
+          "url": "https://www.prnewswire.com/news-releases/marketo-co-founder-jon-miller-launches-phave-marketing-automation-that-reasons-instead-of-following-rules-302886711.html"
+        },
+        {
+          "company": "UiPath",
+          "launch_name": "UiPath Cartographer",
+          "score": 7,
+          "assessable": true,
+          "url": "https://www.uipath.com/newsroom/uipath-launches-uipath-cartographer-map-of-work"
+        },
+        {
+          "company": "Zoho",
+          "launch_name": "Zia Chat + seven vertical SaaS applications",
+          "score": 6,
+          "assessable": true,
+          "url": "https://m.rediff.com/amp/business/report/zoho-unveils-zia-chat-ai-interface-and-seven-vertical-saas-apps/20260923.htm"
+        },
+        {
+          "company": "Outerlimit",
+          "launch_name": "Outerlimit emerges from stealth — Zero Trust for the agent action layer ($16M pre-seed)",
+          "score": 6,
+          "assessable": true,
+          "url": "https://www.outerlimit.com/company-news/outerlimit-launch"
+        }
+      ],
+      "funding": [
+        {
+          "company": "Ema"
+        },
+        {
+          "company": "Kastle"
+        }
+      ]
     }
   ]
 }

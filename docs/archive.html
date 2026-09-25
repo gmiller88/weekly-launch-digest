@@ -112,6 +112,47 @@
     .section-label.funding::before { background: #0055cc; }
     .section-label.launches { color: #007744; }
     .section-label.launches::before { background: #007744; }
+    .section-label.tracking { color: #b8860b; }
+    .section-label.tracking::before { background: #b8860b; }
+
+    /* Post-launch tracking */
+    .d-trk-item {
+      margin-bottom: 18px;
+      padding: 14px 16px;
+      background: #fbfaf6;
+      border-left: 3px solid #b8860b;
+      border-radius: 4px;
+    }
+
+    .d-trk-head { font-size: 15px; font-weight: 600; color: #1a1a2e; margin: 0 0 6px; }
+    .d-trk-meta { font-size: 11px; color: #887; margin-bottom: 8px; }
+    .d-trk-headline { font-size: 14px; line-height: 1.65; color: #333; margin: 0; }
+
+    .d-trk-badge {
+      display: inline-block;
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      background: #777;
+    }
+
+    .d-trk-accelerating { background: #007744; }
+    .d-trk-sustained { background: #0055cc; }
+    .d-trk-decaying { background: #b8860b; }
+    .d-trk-abandoned { background: #c0392b; }
+    .d-trk-unclear { background: #777; }
+
+    .d-trk-block {
+      margin-bottom: 34px;
+      padding-bottom: 30px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .d-trk-block:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
 
     /* ── Digest content (targets from digest/render.py) ───────────── */
 
@@ -287,13 +328,14 @@
     <div id="digest-header">
       <div>
         <h1>Weekly Launch Digest</h1>
-        <div class="date">Archive &mdash; 16 editions</div>
+        <div class="date">Archive &mdash; 17 editions</div>
         <a class="archive-link" href="index.html">&larr; Latest edition</a>
       </div>
     </div>
 
     <div class="digest-section">
       <div class="section-label launches">Past Editions</div>
+      <div class="archive-row"><a href="archive/2026-09-25.html">September 25, 2026</a><span class="meta">5 launches &middot; top score 8/10</span></div>
       <div class="archive-row"><a href="archive/2026-09-18.html">September 18, 2026</a><span class="meta">5 launches &middot; top score 7/10</span></div>
       <div class="archive-row"><a href="archive/2026-09-11.html">September 11, 2026</a><span class="meta">3 launches &middot; top score 8/10</span></div>
       <div class="archive-row"><a href="archive/2026-09-04.html">September 04, 2026</a><span class="meta">3 launches &middot; top score 7/10</span></div>

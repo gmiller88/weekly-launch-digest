@@ -681,6 +681,60 @@
           "company": "Kastle"
         }
       ]
+    },
+    {
+      "date": "2026-10-02",
+      "launches": [
+        {
+          "company": "OpenClaw Foundation",
+          "launch_name": "OpenClaw Enterprise (OCE) — open agent control plane",
+          "score": 8,
+          "assessable": true,
+          "url": "https://venturebeat.com/orchestration/openclaw-launches-free-enterprise-control-plane-for-persistent-ai-agents-backed-by-openai-red-hat-and-nvidia"
+        },
+        {
+          "company": "Omnissa",
+          "launch_name": "Omnissa Elara, IT AI agents and Omnissa Cloud PC (Omnissa ONE 2026)",
+          "score": 7,
+          "assessable": true,
+          "url": "https://siliconangle.com/2026/09/29/omnissa-debuts-ai-agents-for-it-a-managed-cloud-pc-service-and-elara-for-ai-governance"
+        },
+        {
+          "company": "Bloomberg",
+          "launch_name": "Bloomberg Enterprise MCP for Data License Plus",
+          "score": 7,
+          "assessable": true,
+          "url": "https://www.bloomberg.com/company/press/bloomberg-launches-enterprise-mcp-to-seamlessly-connect-bloomberg-data-with-clients-enterprise-ai-applications"
+        },
+        {
+          "company": "env zero",
+          "launch_name": "EZ Control — autonomous cloud control plane (Early Access)",
+          "score": 6.5,
+          "assessable": true,
+          "url": "https://markets.businessinsider.com/news/stocks/env-zero-launches-ez-control-the-autonomous-cloud-control-plane-for-the-ai-era-1036580837"
+        },
+        {
+          "company": "Vega Security",
+          "launch_name": "Vega II",
+          "score": 6,
+          "assessable": true,
+          "url": "https://www.helpnetsecurity.com/2026/09/29/vega-ii-agentic-cyber-defense-platform"
+        }
+      ],
+      "funding": [
+        {
+          "company": "Armadin"
+        },
+        {
+          "company": "Numeral"
+        },
+        {
+          "company": "Confido"
+        },
+        {
+          "company": "Dodge AI"
+        }
+      ]
     }
   ]
 }

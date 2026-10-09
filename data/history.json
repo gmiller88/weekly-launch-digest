@@ -735,6 +735,29 @@
           "company": "Dodge AI"
         }
       ]
+    },
+    {
+      "date": "2026-10-09",
+      "launches": [
+        {
+          "company": "Unknown",
+          "launch_name": "Unknown",
+          "score": null,
+          "assessable": false,
+          "url": ""
+        }
+      ],
+      "funding": [
+        {
+          "company": "Stuut"
+        },
+        {
+          "company": "Doxx"
+        },
+        {
+          "company": "Miter"
+        }
+      ]
     }
   ]
 }

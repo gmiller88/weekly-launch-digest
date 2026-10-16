@@ -758,6 +758,57 @@
           "company": "Miter"
         }
       ]
+    },
+    {
+      "date": "2026-10-16",
+      "launches": [
+        {
+          "company": "Pluto Security",
+          "launch_name": "Stealth exit + $42M (and the Plutonium free-tool wedge that preceded it)",
+          "score": 8,
+          "assessable": true,
+          "url": "https://techcrunch.com/2026/10/13/pluto-security-raises-42m-as-ai-gives-enterprise-security-teams-a-new-headache"
+        },
+        {
+          "company": "Treasure AI (formerly Treasure Data)",
+          "launch_name": "Digital Worker + Personalization Studio + Engagement-Based Pricing (Agentic World 2026)",
+          "score": 7,
+          "assessable": true,
+          "url": "https://www.financialcontent.com/article/bizwire-2026-10-16-treasure-ai-builds-a-brand-live-on-stage-at-agentic-world-2026-unveils-digital-worker"
+        },
+        {
+          "company": "Figma",
+          "launch_name": "Config India 2026: Figma Specs, code layers public beta, Payload CMS in Figma Make, and agent controls",
+          "score": 7,
+          "assessable": true,
+          "url": "https://techcrunch.com/2026/10/14/figma-announces-new-features-to-define-how-agents-work-on-its-platform"
+        },
+        {
+          "company": "Liferay",
+          "launch_name": "Liferay Digital Sales Room (GA)",
+          "score": 6,
+          "assessable": true,
+          "url": "https://www.globenewswire.com/news-release/2026/09/09/3358825/0/en/liferay-announces-general-availability-of-liferay-digital-sales-room.html"
+        },
+        {
+          "company": "nFOX Lab",
+          "launch_name": "nFOX Platform + open-source Blockhouse sandbox (stealth exit)",
+          "score": 4,
+          "assessable": true,
+          "url": "https://siliconangle.com/2026/10/15/startup-nfox-to-open-source-its-sandbox-for-open-ai-models"
+        }
+      ],
+      "funding": [
+        {
+          "company": "Modal Labs"
+        },
+        {
+          "company": "TypeSafe AI"
+        },
+        {
+          "company": "RapidCanvas"
+        }
+      ]
     }
   ]
 }

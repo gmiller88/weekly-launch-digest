@@ -809,6 +809,51 @@
           "company": "RapidCanvas"
         }
       ]
+    },
+    {
+      "date": "2026-10-23",
+      "launches": [
+        {
+          "company": "Anthropic",
+          "launch_name": "Claude Duet — proactive AI agent for professionals",
+          "score": 8,
+          "assessable": true,
+          "url": "https://www.thurrott.com/a-i/anthropic/343121/anthropic-announces-claude-duet-a-personal-ai-agent"
+        },
+        {
+          "company": "Arda (Arda Industries)",
+          "launch_name": "Arda — AI manufacturing platform (stealth exit)",
+          "score": 7,
+          "assessable": true,
+          "url": "https://www.tectonicdefense.com/arda-emerges-from-stealth-with-232m-for-automated-manufacturing"
+        },
+        {
+          "company": "Different",
+          "launch_name": "Different — AI marketing system for B2B companies",
+          "score": 6,
+          "assessable": true,
+          "url": "https://www.cnbc.com/video/2026/10/20/ajeet-singh-different-co-founder-ceo-a-fortt-knox-update.html"
+        },
+        {
+          "company": "Celigo",
+          "launch_name": "Celigo MCP Management",
+          "score": 6,
+          "assessable": true,
+          "url": "https://www.celigo.com/news/introducing-mcp-management"
+        },
+        {
+          "company": "Skyfall AI",
+          "launch_name": "SKY-001 — world model built for engineering",
+          "score": 5,
+          "assessable": true,
+          "url": ""
+        }
+      ],
+      "funding": [
+        {
+          "company": "Blacksmith"
+        }
+      ]
     }
   ]
 }

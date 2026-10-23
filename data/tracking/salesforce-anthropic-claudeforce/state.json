@@ -8,6 +8,7 @@
   "url": "https://www.salesforce.com/news/press-releases/2026/08/26/salesforce-and-anthropic-announce-claudeforce",
   "baseline_captured": "2026-09-18",
   "checkpoints_done": [
-    4
+    4,
+    8
   ]
 }

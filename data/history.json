@@ -854,6 +854,60 @@
           "company": "Blacksmith"
         }
       ]
+    },
+    {
+      "date": "2026-10-30",
+      "launches": [
+        {
+          "company": "GitHub",
+          "launch_name": "GitHub Universe 2026 — \"completed work, not more code\" / end-to-end agentic software delivery system",
+          "score": 7,
+          "assessable": true,
+          "url": "https://github.blog/news-insights/company-news/github-universe-2026-evolving-every-layer-of-the-stack"
+        },
+        {
+          "company": "Aera Technology",
+          "launch_name": "AeraHUB 26 keynote — six agentic innovations and the \"decision governance\" repositioning",
+          "score": 7,
+          "assessable": true,
+          "url": "https://www.enterprisetimes.co.uk/2026/10/30/aera-bets-on-decision-governance-not-just-ai"
+        },
+        {
+          "company": "Fragment",
+          "launch_name": "Fragment stealth exit — AI agents for direct procurement, $56M",
+          "score": 6,
+          "assessable": true,
+          "url": "https://www.axios.com/pro/enterprise-software-deals/2026/10/28/fragment-procurement-software-botha"
+        },
+        {
+          "company": "Dream (dreamhq.com)",
+          "launch_name": "Stealth exit + $17M seed — \"built world models\" for AEC",
+          "score": 6,
+          "assessable": true,
+          "url": "https://techcrunch.com/2026/10/29/ex-palantir-execs-launch-dream-with-17m-from-a16z-to-build-ai-world-models-for-construction"
+        },
+        {
+          "company": "Stripe",
+          "launch_name": "Stripe Pay — free instant B2B transfers via business handles",
+          "score": 6,
+          "assessable": true,
+          "url": "https://x.com/stripe/status/2115122346075832468"
+        }
+      ],
+      "funding": [
+        {
+          "company": "Legora"
+        },
+        {
+          "company": "Serval"
+        },
+        {
+          "company": "Casap"
+        },
+        {
+          "company": "Whop"
+        }
+      ]
     }
   ]
 }

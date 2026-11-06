@@ -908,6 +908,51 @@
           "company": "Whop"
         }
       ]
+    },
+    {
+      "date": "2026-11-06",
+      "launches": [
+        {
+          "company": "OpenAI",
+          "launch_name": "GPT-6 Cyber (and the Daybreak access program)",
+          "score": 8,
+          "assessable": true,
+          "url": "https://openai.com/index/introducing-gpt-6-cyber"
+        },
+        {
+          "company": "Lemhi",
+          "launch_name": "Lemhi managed AI platform for MSPs — general availability",
+          "score": 7,
+          "assessable": true,
+          "url": "https://www.lemhi.com/press/lemhi-launches-general-availability-at-it-nation-connect"
+        },
+        {
+          "company": "Contentsquare",
+          "launch_name": "AI-First Experience Platform + Sense agentic experimentation (13 October 2026, New York)",
+          "score": 7,
+          "assessable": true,
+          "url": ""
+        },
+        {
+          "company": "42AI",
+          "launch_name": "42AI stealth exit — \"behavioral world model\" ($62.5M seed)",
+          "score": 6,
+          "assessable": true,
+          "url": "https://techcrunch.com/2026/11/02/42ai-comes-out-of-stealth-with-62-5m-and-a-world-model-that-can-predict-human-behavior"
+        },
+        {
+          "company": "Snowflake",
+          "launch_name": "Business Ontology (Horizon Catalog)",
+          "score": 6,
+          "assessable": true,
+          "url": "https://www.infoworld.com/article/4243932/snowflake-launches-business-ontology-to-boost-ai-agent-reliability.html"
+        }
+      ],
+      "funding": [
+        {
+          "company": "Traversal"
+        }
+      ]
     }
   ]
 }

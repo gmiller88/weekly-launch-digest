@@ -953,6 +953,57 @@
           "company": "Traversal"
         }
       ]
+    },
+    {
+      "date": "2026-11-13",
+      "launches": [
+        {
+          "company": "Fireflies.ai",
+          "launch_name": "The new Fred — AI teammate platform (plus Fireflies Fly hardware preview)",
+          "score": 7,
+          "assessable": true,
+          "url": "https://www.globenewswire.com/news-release/2026/11/11/3400748/0/en/fireflies-ai-evolves-from-ai-notetaker-to-ai-teammate-in-its-most-significant-expansion-to-date.html"
+        },
+        {
+          "company": "Databricks",
+          "launch_name": "Always-on Genie, Genie Ontology, Genie Search and Ontology Manager",
+          "score": 7,
+          "assessable": true,
+          "url": "https://www.databricks.com/company/newsroom/press-releases/databricks-launches-new-always-genie-autonomous-ai-complex"
+        },
+        {
+          "company": "Dreeze",
+          "launch_name": "Stealth exit + $33M seed + \"Application Revival\" platform GA on AWS",
+          "score": 7,
+          "assessable": true,
+          "url": "https://www.calcalistech.com/ctechnews/article/rkkeose0fe"
+        },
+        {
+          "company": "G2",
+          "launch_name": "Unified platform across G2, Capterra, Software Advice and GetApp — 'Win the Answer' in the agentic era",
+          "score": 7,
+          "assessable": true,
+          "url": "https://www.prnewswire.com/news-releases/g2-brings-four-leading-software-marketplaces-together-to-help-brands-win-the-answer-in-the-agentic-era-302933856.html"
+        },
+        {
+          "company": "Nooks",
+          "launch_name": "Node — autonomous AI sales agents (early access)",
+          "score": 6,
+          "assessable": true,
+          "url": ""
+        }
+      ],
+      "funding": [
+        {
+          "company": "Rox"
+        },
+        {
+          "company": "Trajectory"
+        },
+        {
+          "company": "Dreeze"
+        }
+      ]
     }
   ]
 }

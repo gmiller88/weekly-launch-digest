@@ -1004,6 +1004,57 @@
           "company": "Dreeze"
         }
       ]
+    },
+    {
+      "date": "2026-11-20",
+      "launches": [
+        {
+          "company": "Dreamteam",
+          "launch_name": "Dreamteam — AI-native CRM (stealth exit, $53M)",
+          "score": 7,
+          "assessable": true,
+          "url": "https://www.business-standard.com/companies/start-ups/dreamteam-emerges-from-stealth-with-53-million-to-build-ai-native-crm-126111601767_1.html"
+        },
+        {
+          "company": "Amazon Web Services",
+          "launch_name": "AWS Marketplace agentic procurement (re:Invent 2026)",
+          "score": 7,
+          "assessable": true,
+          "url": "https://fortune.com/2026/11/19/aws-marketplace-rolls-out-ai-agents-to-shop-for-software-autonomously"
+        },
+        {
+          "company": "Vero Security",
+          "launch_name": "Vero — AISecurityEngineering.org community + AI Runtime Governor platform (with $11M seed)",
+          "score": 7,
+          "assessable": true,
+          "url": "https://venturebeat.com/security/vero-launches-free-ai-security-community-as-enterprises-confront-the-work-of-governing-agents"
+        },
+        {
+          "company": "ServiceNow",
+          "launch_name": "Autonomous CRM Engine",
+          "score": 7,
+          "assessable": true,
+          "url": "https://newsroom.servicenow.com/press-releases/details/2026/ServiceNow-Autonomous-CRM-Engine-enables-fast-CRM-deployments-that-free-enterprises-from-legacy-platforms/default.aspx"
+        },
+        {
+          "company": "Metano",
+          "launch_name": "Metano — AI agent security platform (GA launch, $12M seed)",
+          "score": 6,
+          "assessable": true,
+          "url": "https://siliconangle.com/2026/11/19/metano-launches-with-12m-to-help-enterprises-secure-ai-agents"
+        }
+      ],
+      "funding": [
+        {
+          "company": "Linq"
+        },
+        {
+          "company": "LanceDB"
+        },
+        {
+          "company": "Payhawk"
+        }
+      ]
     }
   ]
 }

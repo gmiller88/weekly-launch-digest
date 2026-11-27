@@ -1055,6 +1055,63 @@
           "company": "Payhawk"
         }
       ]
+    },
+    {
+      "date": "2026-11-27",
+      "launches": [
+        {
+          "company": "Epochal",
+          "launch_name": "Time Portal",
+          "score": 8,
+          "assessable": true,
+          "url": "https://www.forbes.com/sites/anishasircar/2026/11/27/former-xai-founders-built-a-time-machine-for-ai-agents-will-it-help-them-predict-the-future"
+        },
+        {
+          "company": "Microsoft",
+          "launch_name": "Microsoft IQ (with Work IQ) and Agent 365, Ignite 2026",
+          "score": 8,
+          "assessable": true,
+          "url": "https://www.infoq.com/news/2026/11/microsoft-ignite-2026-recap"
+        },
+        {
+          "company": "Anthropic",
+          "launch_name": "Claude Ship",
+          "score": 7,
+          "assessable": true,
+          "url": "https://techcrunch.com/2026/11/23/anthropic-launches-claude-ship-letting-ai-agents-review-fix-and-approve-code-changes"
+        },
+        {
+          "company": "Flexprice",
+          "launch_name": "Ferry — AI revenue coworker",
+          "score": 6,
+          "assessable": true,
+          "url": "https://markets.businessinsider.com/news/currencies/flexprice-launches-ferry-to-move-finance-teams-from-operating-software-to-directing-it-1036796404"
+        },
+        {
+          "company": "Dante Security",
+          "launch_name": "Dante — human ownership layer for enterprise AI agents",
+          "score": 6,
+          "assessable": true,
+          "url": "https://dealroom.co/news/175321-dante-security-raises-10m-to-give-enterprise-ai-agents-human-owners"
+        }
+      ],
+      "funding": [
+        {
+          "company": "Dreamteam"
+        },
+        {
+          "company": "Corma"
+        },
+        {
+          "company": "Marlowe"
+        },
+        {
+          "company": "Charta Health"
+        },
+        {
+          "company": "Clara"
+        }
+      ]
     }
   ]
 }
